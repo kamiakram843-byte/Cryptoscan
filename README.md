@@ -1,0 +1,2 @@
+# Cryptoscan
+Crypto scanner

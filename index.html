@@ -1,42 +1,272 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Multi-Timeframe Algorithmic Scanner</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crypto Scanner Lite</title>
+<style>
+body{margin:0;padding:12px;background:#0b1020;color:#eef3ff;font:15px Arial}
+h1{font-size:25px}.box{background:#141c30;border:1px solid #30405c;border-radius:12px;padding:13px;margin:12px 0}
+button,select,input{padding:10px;margin:4px;border-radius:7px;background:#202c45;color:white;border:1px solid #506080}
+button{background:#315ee8;font-weight:bold}
+.status{color:#ffd166;line-height:1.6;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat{background:#0c1426;padding:12px;border-radius:8px}
+small{color:#aab8d0}.table{overflow-x:auto}
+table{border-collapse:collapse;min-width:720px;width:100%}
+td,th{padding:9px;border-bottom:1px solid #30405c;text-align:left}
+a{color:#7aa7ff}.BUY{color:#31d49a}.SELL{color:#ff6878}.WAIT{color:#ffd166}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-main">
-                <h1>Crypto Multi-Timeframe Scanner</h1>
-                <button id="scanBtn">Scan Now</button>
-            </div>
-            <p class="update-time">Last complete network update: <span id="updateTime">Never</span></p>
-        </header>
+<h1>🚀 Crypto Scanner Lite</h1>
+<p>Binance Spot | RSI 14 | Bollinger Bands 20,2</p>
 
-        <main>
-            <div class="table-container">
-                <table id="scannerTable">
-                    <thead>
-                        <tr>
-                            <th>Asset</th>
-                            <th>Current Price</th>
-                            <th>15m Signal</th>
-                            <th>1h Signal</th>
-                            <th>4h Signal</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr>
-                            <td colspan="5" class="loading">Click "Scan Now" to fetch live technical data...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-    <script src="script.js"></script>
+<div class="box">
+<label>Coins:
+<select id="limit">
+<option value="5">5 (test)</option>
+<option value="10" selected>10</option>
+<option value="20">20</option>
+</select></label>
+<br>
+<label>Minimum volume:
+<input id="vol" type="number" value="1000000" style="width:130px">
+</label>
+<br>
+<button id="scan">SCAN MARKETS</button>
+<button id="stop">STOP</button>
+<div id="status" class="status">Ready. Press Scan Markets.</div>
+</div>
+
+<div class="stats">
+<div class="stat">Scanned<strong id="count">0</strong></div>
+<div class="stat">BUY<strong id="buys">0</strong></div>
+<div class="stat">SELL<strong id="sells">0</strong></div>
+<div class="stat">Updated<strong id="updated">--</strong></div>
+</div>
+
+<div class="box">
+<label>Filter:
+<select id="filter">
+<option value="ALL">All</option>
+<option value="BUY">BUY</option>
+<option value="SELL">SELL</option>
+<option value="WAIT">WAIT</option>
+</select></label>
+<div class="table">
+<table>
+<thead><tr>
+<th>Coin</th><th>Signal</th><th>Price</th>
+<th>1h RSI</th><th>15m RSI</th><th>4h RSI</th>
+<th>Reason</th>
+</tr></thead>
+<tbody id="rows"><tr><td colspan="7">No results</td></tr></tbody>
+</table>
+</div>
+</div>
+
+<div class="box">
+<b>BUY:</b> 1h candle touches lower Bollinger Band and RSI is below 30.
+<p><b>SELL:</b> 1h candle touches upper Bollinger Band and RSI is above 30.</p>
+<small>Signals are not guarantees of profit. No automatic trades are placed. RSI above 30 is not necessarily overbought.</small>
+</div>
+
+<script>
+"use strict";
+
+const API="https://data-api.binance.vision/api/v3";
+const $=id=>document.getElementById(id);
+let stop=false,busy=false,results=[];
+
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+async function get(url){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),10000);
+ try{
+  const response=await fetch(url,{signal:controller.signal});
+  if(!response.ok)throw Error("HTTP "+response.status);
+  return await response.json();
+ }finally{clearTimeout(timer);}
+}
+
+function candles(raw){
+ const now=Date.now();
+ return raw.filter(k=>Number(k[6])<now).map(k=>({
+  open:+k[1],high:+k[2],low:+k[3],
+  close:+k[4],end:+k[6]
+ }));
+}
+
+function RSI(v,p=14){
+ if(v.length<=p)return null;
+ let gain=0,loss=0;
+ for(let i=1;i<=p;i++){
+  let d=v[i]-v[i-1];
+  gain+=Math.max(d,0);
+  loss+=Math.max(-d,0);
+ }
+ let ag=gain/p,al=loss/p;
+ for(let i=p+1;i<v.length;i++){
+  let d=v[i]-v[i-1];
+  ag=(ag*(p-1)+Math.max(d,0))/p;
+  al=(al*(p-1)+Math.max(-d,0))/p;
+ }
+ if(al===0)return ag===0?50:100;
+ return 100-100/(1+ag/al);
+}
+
+function BB(c){
+ let v=c.slice(-20).map(x=>x.close);
+ let mean=v.reduce((a,b)=>a+b,0)/20;
+ let sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)**2,0)/20);
+ return {low:mean-2*sd,high:mean+2*sd};
+}
+
+function analyze(c15,c1,c4,volume){
+ if(c15.length<20||c1.length<20||c4.length<20)
+  throw Error("Not enough candles");
+
+ let last=c1[c1.length-1];
+ let short=c15[c15.length-1];
+ let band=BB(c1);
+ let r1=RSI(c1.map(x=>x.close));
+ let r15=RSI(c15.map(x=>x.close));
+ let r4=RSI(c4.map(x=>x.close));
+
+ let lower=last.low<=band.low;
+ let upper=last.high>=band.high;
+ let signal="WAIT",reason="No Bollinger Band touch";
+
+ if(lower&&r1<30){
+  signal="BUY";
+  reason="Lower band touched; RSI below 30";
+  reason+=r15<40||short.close>short.open?
+   "; 15m rebound hint":"; rebound unconfirmed";
+ }else if(upper&&r1>30){
+  signal="SELL";
+  reason="Upper band touched; RSI above 30";
+  reason+=r15>60||short.close<short.open?
+   "; 15m weakness hint":"; exit unconfirmed";
+ }else if(lower){
+  reason="Lower band touched; RSI not below 30";
+ }else if(upper){
+  reason="Upper band touched; RSI not above 30";
+ }
+
+ if(volume<Number($("vol").value||0))
+  reason+="; low volume";
+
+ return {signal,price:last.close,r1,r15,r4,reason};
+}
+
+function render(){
+ let filter=$("filter").value;
+ let list=results.filter(x=>filter==="ALL"||x.signal===filter);
+ let rank={BUY:0,SELL:1,WAIT:2};
+ list.sort((a,b)=>rank[a.signal]-rank[b.signal]);
+
+ $("rows").innerHTML=list.map(x=>`
+ <tr>
+ <td><a target="_blank" rel="noopener"
+ href="https://www.tradingview.com/chart/?symbol=BINANCE%3A${encodeURIComponent(x.symbol)}">${x.symbol}</a></td>
+ <td class="${x.signal}"><b>${x.signal}</b></td>
+ <td>${Number(x.price).toPrecision(7)}</td>
+ <td>${x.r1.toFixed(1)}</td>
+ <td>${x.r15.toFixed(1)}</td>
+ <td>${x.r4.toFixed(1)}</td>
+ <td>${x.reason}</td>
+ </tr>`).join("")||'<tr><td colspan="7">No results</td></tr>';
+
+ $("count").textContent=results.length;
+ $("buys").textContent=results.filter(x=>x.signal==="BUY").length;
+ $("sells").textContent=results.filter(x=>x.signal==="SELL").length;
+}
+
+$("filter").onchange=render;
+$("stop").onclick=()=>{stop=true;$("status").textContent="Stopping after current coin...";};
+$("scan").onclick=scan;
+
+async function scan(){
+ if(busy)return;
+ busy=true;stop=false;results=[];render();
+ $("scan").disabled=true;
+
+ try{
+  $("status").textContent="Loading Binance markets...";
+
+  const [info,tickers]=await Promise.all([
+   get(API+"/exchangeInfo"),
+   get(API+"/ticker/24hr")
+  ]);
+
+  const volumes=new Map(tickers.map(t=>[t.symbol,+t.quoteVolume]));
+
+  let pairs=info.symbols.filter(s=>
+   s.status==="TRADING"&&s.isSpotTradingAllowed&&
+   s.quoteAsset==="USDT"&&
+   !/(UP|DOWN|BULL|BEAR|[235]L|[235]S)USDT$/.test(s.symbol)
+  ).map(s=>({
+   symbol:s.symbol,
+   volume:volumes.get(s.symbol)||0
+  })).filter(s=>s.volume>=Number($("vol").value||0))
+    .sort((a,b)=>b.volume-a.volume)
+    .slice(0,Number($("limit").value));
+
+  if(!pairs.length){
+   $("status").textContent="No pairs found. Lower the volume threshold.";
+   return;
+  }
+
+  for(let i=0;i<pairs.length;i++){
+   if(stop)break;
+
+   const pair=pairs[i];
+   $("status").textContent=
+    "Scanning "+(i+1)+"/"+pairs.length+": "+pair.symbol;
+
+   try{
+    const url=tf=>API+"/klines?symbol="+pair.symbol+
+     "&interval="+tf+"&limit=60";
+
+    const a=await get(url("15m"));
+    await wait(100);
+    const b=await get(url("1h"));
+    await wait(100);
+    const c=await get(url("4h"));
+
+    const result=analyze(candles(a),candles(b),candles(c),pair.volume);
+    result.symbol=pair.symbol;
+    results.push(result);
+   }catch(error){
+    console.log("Skipped",pair.symbol,error.message);
+   }
+
+   render();
+
+   // Yield to the browser between coins.
+   await wait(150);
+  }
+
+  $("updated").textContent=new Date().toLocaleTimeString();
+  $("status").textContent=stop?
+   "Stopped. "+results.length+" coins analyzed.":
+   "Finished. "+results.length+" coins analyzed.";
+
+  if(!results.length&&!stop){
+   $("status").textContent+=" No data received. Check API access.";
+  }
+ }catch(error){
+  $("status").textContent=
+   "Error: "+error.message+
+   ". Check internet/API access or try hosting this HTML on a website.";
+ }finally{
+  busy=false;
+  $("scan").disabled=false;
+ }
+}
+</script>
 </body>
 </html>

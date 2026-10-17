@@ -3,27 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Multi-Timeframe Signal Dashboard</title>
-    <!-- Links your styling sheet -->
+    <title>Crypto Multi-Timeframe Scanner</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Links your indicator logic code -->
-    <script src="script.js" defer></script>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <div class="header-main">
+                <h1>Crypto Multi-Timeframe Scanner</h1>
+                <button id="scanBtn">Scan Now</button>
+            </div>
+            <p class="update-time">Last complete network update: <span id="updateTime">Never</span></p>
+        </header>
 
-<div class="container">
-    <header>
-        <div>
-            <h1>Crypto Multi-Timeframe Scanner</h1>
-            <div class="status-bar" id="last-updated">Initializing scanner...</div>
-        </div>
-        <button id="refresh-btn" onclick="scanMarket()">Scan Now</button>
-    </header>
-
-    <div class="crypto-grid" id="dashboard-grid">
-        <!-- Coin cards will dynamically inject here -->
+        <main>
+            <div class="table-container">
+                <table id="scannerTable">
+                    <thead>
+                        <tr>
+                            <th>Asset</th>
+                            <th>Price</th>
+                            <th>1h Change</th>
+                            <th>24h Change</th>
+                            <th>7d Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="5" class="loading">Click "Scan Now" to fetch live market data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
     </div>
-</div>
-
+    <script src="script.js"></script>
 </body>
 </html>

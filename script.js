@@ -2,14 +2,9 @@ const scanBtn = document.getElementById('scanBtn');
 const tableBody = document.getElementById('tableBody');
 const updateTimeSpan = document.getElementById('updateTime');
 
-// Array of major market pairs on Binance
 const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'SOLUSDT', 'ADAUSDT', 'DOGEUSDT', 'DOTUSDT', 'MATICUSDT', 'LTCUSDT'];
-const timeframes = ['15m', '1h', '4h'];
-
-// Delay helper to prevent spam filters from blocking requests
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper to compute Simple Moving Average
 function calcSMA(data, period) {
     let sma = [];
     for (let i = period - 1; i < data.length; i++) {
@@ -22,7 +17,6 @@ function calcSMA(data, period) {
     return sma;
 }
 
-// Helper to calculate Bollinger Bands (20 Period, 2 Std Dev)
 function calcBollingerBands(closingPrices) {
     const period = 20;
     if (closingPrices.length < period) return null;
@@ -30,7 +24,6 @@ function calcBollingerBands(closingPrices) {
     const smaHistory = calcSMA(closingPrices, period);
     const lastSma = smaHistory[smaHistory.length - 1];
     
-    // Calculate Standard Deviation for the last 20 elements
     const slice = closingPrices.slice(-period);
     const variance = slice.reduce((sum, val) => sum + Math.pow(val - lastSma, 2), 0) / period;
     const stdDev = Math.sqrt(variance);
@@ -42,7 +35,6 @@ function calcBollingerBands(closingPrices) {
     };
 }
 
-// Helper to calculate RSI (14 Period)
 function calcRSI(closingPrices) {
     const period = 14;
     if (closingPrices.length <= period) return 50; 
@@ -61,11 +53,9 @@ function calcRSI(closingPrices) {
         }
     }
 
-    // Initial Avg
     let avgGain = gains.slice(0, period).reduce((a, b) => a + b, 0) / period;
     let avgLoss = losses.slice(0, period).reduce((a, b) => a + b, 0) / period;
 
-    // Smoothed Wilder's Moving Average
     for (let i = period; i < gains.length; i++) {
         avgGain = ((avgGain * (period - 1)) + gains[i]) / period;
         avgLoss = ((avgLoss * (period - 1)) + losses[i]) / period;
@@ -76,7 +66,6 @@ function calcRSI(closingPrices) {
     return 100 - (100 / (1 + rs));
 }
 
-// Evaluates parameters and yields customized layout signals
 function evaluateSignal(price, rsi, bb) {
     if (!bb) return '<span class="badge neutral">No Data</span>';
     
@@ -90,7 +79,7 @@ function evaluateSignal(price, rsi, bb) {
 }
 
 async function runTechnicalScanner() {
-    tableBody.innerHTML = `<tr><td colspan="5" class="loading">Connecting to Binance endpoints & running indicators...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="5" class="loading">Parsing chart metrics from Binance network...</td></tr>`;
     
     let rowsHtml = '';
     
@@ -98,16 +87,16 @@ async function runTechnicalScanner() {
         try {
             let currentPrice = 0;
             let signals = {};
+            const timeframes = ['15m', '1h', '4h'];
 
             for (const tf of timeframes) {
-                // Fetching historical candlestick matrices safely
                 const res = await fetch(`https://binance.com{symbol}&interval=${tf}&limit=50`);
                 
-                if (!res.ok) throw new Error("Binance API rate limit restriction encountered.");
+                if (!res.ok) throw new Error("API Limit");
                 
                 const klines = await res.json();
                 
-                // CRITICAL FIX: Explicitly parse string metrics into absolute floating numbers
+                // FIXED CRITICAL LINE: target index [4] explicitly to read closing numbers
                 const closes = klines.map(k => parseFloat(k[4])); 
                 const lastPrice = closes[closes.length - 1];
                 currentPrice = lastPrice; 
@@ -117,8 +106,8 @@ async function runTechnicalScanner() {
                 
                 signals[tf] = evaluateSignal(lastPrice, rsiVal, bbVal);
                 
-                // Short 150ms sleep gap between timeframe fetches to protect baseline IP weights
-                await sleep(150);
+                // Add a robust 300ms pause to ensure smooth data retrieval
+                await sleep(300);
             }
 
             const cleanName = symbol.replace('USDT', '');
@@ -137,8 +126,8 @@ async function runTechnicalScanner() {
                 </tr>
             `;
             
-            // Render rows progressively so the user sees results loading without a blank lag screen
-            tableBody.innerHTML = rowsHtml + `<tr><td colspan="5" class="loading" style="font-size:0.8rem;">Scanning remaining token pairs...</td></tr>`;
+            // Progressive interface loading updates
+            tableBody.innerHTML = rowsHtml + `<tr><td colspan="5" class="loading" style="font-size:0.8rem;">Calculating structural indicators...</td></tr>`;
             
         } catch (err) {
             console.error(err);
@@ -150,6 +139,8 @@ async function runTechnicalScanner() {
                 </tr>
             `;
             tableBody.innerHTML = rowsHtml;
+            // Sleep longer on error to clear rate limits
+            await sleep(1000);
         }
     }
 

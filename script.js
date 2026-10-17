@@ -15,12 +15,10 @@ self.addEventListener("notificationclick", event => {
       type: "window",
       includeUncontrolled: true
     }).then(clients => {
-      if (clients.length > 0) {
+      if (clients.length) {
         return clients[0].focus();
       }
-
       return self.clients.openWindow("./");
     })
   );
 });
-

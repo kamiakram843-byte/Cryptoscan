@@ -6,6 +6,9 @@ const updateTimeSpan = document.getElementById('updateTime');
 const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'SOLUSDT', 'ADAUSDT', 'DOGEUSDT', 'DOTUSDT', 'MATICUSDT', 'LTCUSDT'];
 const timeframes = ['15m', '1h', '4h'];
 
+// Delay helper to prevent spam filters from blocking requests
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 // Helper to compute Simple Moving Average
 function calcSMA(data, period) {
     let sma = [];
@@ -42,7 +45,7 @@ function calcBollingerBands(closingPrices) {
 // Helper to calculate RSI (14 Period)
 function calcRSI(closingPrices) {
     const period = 14;
-    if (closingPrices.length <= period) return 50; // default neutral if history missing
+    if (closingPrices.length <= period) return 50; 
 
     let gains = [];
     let losses = [];
@@ -73,7 +76,7 @@ function calcRSI(closingPrices) {
     return 100 - (100 / (1 + rs));
 }
 
-// Evaluates the math constraints and yields custom badge styling text
+// Evaluates parameters and yields customized layout signals
 function evaluateSignal(price, rsi, bb) {
     if (!bb) return '<span class="badge neutral">No Data</span>';
     
@@ -87,7 +90,7 @@ function evaluateSignal(price, rsi, bb) {
 }
 
 async function runTechnicalScanner() {
-    tableBody.innerHTML = `<tr><td colspan="5" class="loading">Processing exchange endpoints & running equations...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="5" class="loading">Connecting to Binance endpoints & running indicators...</td></tr>`;
     
     let rowsHtml = '';
     
@@ -96,21 +99,26 @@ async function runTechnicalScanner() {
             let currentPrice = 0;
             let signals = {};
 
-            // Loop through each required timeframe chart configuration setup
             for (const tf of timeframes) {
-                // Fetching 50 historical candles via public endpoint to safely process 20-period technical scripts
+                // Fetching historical candlestick matrices safely
                 const res = await fetch(`https://binance.com{symbol}&interval=${tf}&limit=50`);
-                if (!res.ok) throw new Error("Binance API Refusal");
+                
+                if (!res.ok) throw new Error("Binance API rate limit restriction encountered.");
                 
                 const klines = await res.json();
-                const closes = klines.map(k => parseFloat(k[4])); // index 4 is the closing price
+                
+                // CRITICAL FIX: Explicitly parse string metrics into absolute floating numbers
+                const closes = klines.map(k => parseFloat(k[4])); 
                 const lastPrice = closes[closes.length - 1];
-                currentPrice = lastPrice; // store latest ticker price
+                currentPrice = lastPrice; 
 
                 const rsiVal = calcRSI(closes);
                 const bbVal = calcBollingerBands(closes);
                 
                 signals[tf] = evaluateSignal(lastPrice, rsiVal, bbVal);
+                
+                // Short 150ms sleep gap between timeframe fetches to protect baseline IP weights
+                await sleep(150);
             }
 
             const cleanName = symbol.replace('USDT', '');
@@ -128,15 +136,20 @@ async function runTechnicalScanner() {
                     <td>${signals['4h']}</td>
                 </tr>
             `;
+            
+            // Render rows progressively so the user sees results loading without a blank lag screen
+            tableBody.innerHTML = rowsHtml + `<tr><td colspan="5" class="loading" style="font-size:0.8rem;">Scanning remaining token pairs...</td></tr>`;
+            
         } catch (err) {
             console.error(err);
             const cleanName = symbol.replace('USDT', '');
             rowsHtml += `
                 <tr>
                     <td><span class="coin-name">${cleanName}</span></td>
-                    <td colspan="4" class="error">Data processing dropped due to rate limit protection.</td>
+                    <td colspan="4" class="error">Data processing dropped due to network threshold protection.</td>
                 </tr>
             `;
+            tableBody.innerHTML = rowsHtml;
         }
     }
 

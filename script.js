@@ -2,72 +2,148 @@ const scanBtn = document.getElementById('scanBtn');
 const tableBody = document.getElementById('tableBody');
 const updateTimeSpan = document.getElementById('updateTime');
 
-// List of top coins to scan
-const coins = ['bitcoin', 'ethereum', 'binancecoin', 'ripple', 'solana', 'cardano', 'dogecoin', 'polkadot', 'matic-network', 'litecoin'];
+// Array of major market pairs on Binance
+const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'SOLUSDT', 'ADAUSDT', 'DOGEUSDT', 'DOTUSDT', 'MATICUSDT', 'LTCUSDT'];
+const timeframes = ['15m', '1h', '4h'];
 
-async function fetchMarketData() {
-    tableBody.innerHTML = `<tr><td colspan="5" class="loading">Fetching network data... Please wait.</td></tr>`;
-    
-    try {
-        // Fetching prices and price change percentages across multiple timeframes from CoinGecko public API
-        const url = `https://coingecko.com{coins.join(',')}&order=market_cap_desc&per_page=10&page=1&sparkline=false&price_change_percentage=1h,24h,7d`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('API Rate Limit or Network Error');
-        
-        const data = await response.json();
-        renderTable(data);
-        
-        // Update Timestamp
-        const now = new Date();
-        updateTimeSpan.textContent = now.toLocaleTimeString() + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone;
-    } catch (error) {
-        console.error(error);
-        tableBody.innerHTML = `<tr><td colspan="5" class="error">⚠️ Failed to load data. The API might be busy. Please try again in a few seconds.</td></tr>`;
+// Helper to compute Simple Moving Average
+function calcSMA(data, period) {
+    let sma = [];
+    for (let i = period - 1; i < data.length; i++) {
+        let sum = 0;
+        for (let j = 0; j < period; j++) {
+            sum += data[i - j];
+        }
+        sma.push(sum / period);
     }
+    return sma;
 }
 
-function renderTable(cryptoData) {
-    tableBody.innerHTML = '';
+// Helper to calculate Bollinger Bands (20 Period, 2 Std Dev)
+function calcBollingerBands(closingPrices) {
+    const period = 20;
+    if (closingPrices.length < period) return null;
     
-    if (cryptoData.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5" class="loading">No data found.</td></tr>`;
-        return;
+    const smaHistory = calcSMA(closingPrices, period);
+    const lastSma = smaHistory[smaHistory.length - 1];
+    
+    // Calculate Standard Deviation for the last 20 elements
+    const slice = closingPrices.slice(-period);
+    const variance = slice.reduce((sum, val) => sum + Math.pow(val - lastSma, 2), 0) / period;
+    const stdDev = Math.sqrt(variance);
+    
+    return {
+        upper: lastSma + (2 * stdDev),
+        middle: lastSma,
+        lower: lastSma - (2 * stdDev)
+    };
+}
+
+// Helper to calculate RSI (14 Period)
+function calcRSI(closingPrices) {
+    const period = 14;
+    if (closingPrices.length <= period) return 50; // default neutral if history missing
+
+    let gains = [];
+    let losses = [];
+
+    for (let i = 1; i < closingPrices.length; i++) {
+        let diff = closingPrices[i] - closingPrices[i - 1];
+        if (diff >= 0) {
+            gains.push(diff);
+            losses.push(0);
+        } else {
+            gains.push(0);
+            losses.push(Math.abs(diff));
+        }
     }
 
-    cryptoData.forEach(coin => {
-        const price = coin.current_price ? `$${coin.current_price.toLocaleString()}` : 'N/A';
-        
-        // Extracting historical changes safely
-        const p1h = coin.price_change_percentage_1h_in_currency;
-        const p24h = coin.price_change_percentage_24h_in_currency;
-        const p7d = coin.price_change_percentage_7d_in_currency;
+    // Initial Avg
+    let avgGain = gains.slice(0, period).reduce((a, b) => a + b, 0) / period;
+    let avgLoss = losses.slice(0, period).reduce((a, b) => a + b, 0) / period;
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="coin-cell">
-                <img src="${coin.image}" alt="${coin.name}" class="coin-icon">
-                <div>
-                    <span class="coin-name">${coin.name}</span>
-                    <span class="coin-symbol">${coin.symbol.toUpperCase()}</span>
-                </div>
-            </td>
-            <td><strong>${price}</strong></td>
-            <td class="${p1h >= 0 ? 'up' : 'down'}">${formatPercent(p1h)}</td>
-            <td class="${p24h >= 0 ? 'up' : 'down'}">${formatPercent(p24h)}</td>
-            <td class="${p7d >= 0 ? 'up' : 'down'}">${formatPercent(p7d)}</td>
-        `;
-        tableBody.appendChild(row);
-    });
+    // Smoothed Wilder's Moving Average
+    for (let i = period; i < gains.length; i++) {
+        avgGain = ((avgGain * (period - 1)) + gains[i]) / period;
+        avgLoss = ((avgLoss * (period - 1)) + losses[i]) / period;
+    }
+
+    if (avgLoss === 0) return 100;
+    const rs = avgGain / avgLoss;
+    return 100 - (100 / (1 + rs));
 }
 
-function formatPercent(value) {
-    if (value === undefined || value === null) return 'N/A';
-    return (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
+// Evaluates the math constraints and yields custom badge styling text
+function evaluateSignal(price, rsi, bb) {
+    if (!bb) return '<span class="badge neutral">No Data</span>';
+    
+    if (price <= bb.lower && rsi < 30) {
+        return `<span class="badge buy">🟢 BUY (RSI: ${rsi.toFixed(1)})</span>`;
+    } else if (price >= bb.upper && rsi > 80) {
+        return `<span class="badge sell">🔴 SELL (RSI: ${rsi.toFixed(1)})</span>`;
+    }
+    
+    return `<span class="badge neutral">Hold (RSI: ${rsi.toFixed(1)})</span>`;
 }
 
-// Event Listener for the action button
-scanBtn.addEventListener('click', fetchMarketData);
+async function runTechnicalScanner() {
+    tableBody.innerHTML = `<tr><td colspan="5" class="loading">Processing exchange endpoints & running equations...</td></tr>`;
+    
+    let rowsHtml = '';
+    
+    for (const symbol of symbols) {
+        try {
+            let currentPrice = 0;
+            let signals = {};
 
-// Initial execution on load
-window.addEventListener('DOMContentLoaded', fetchMarketData);
+            // Loop through each required timeframe chart configuration setup
+            for (const tf of timeframes) {
+                // Fetching 50 historical candles via public endpoint to safely process 20-period technical scripts
+                const res = await fetch(`https://binance.com{symbol}&interval=${tf}&limit=50`);
+                if (!res.ok) throw new Error("Binance API Refusal");
+                
+                const klines = await res.json();
+                const closes = klines.map(k => parseFloat(k[4])); // index 4 is the closing price
+                const lastPrice = closes[closes.length - 1];
+                currentPrice = lastPrice; // store latest ticker price
+
+                const rsiVal = calcRSI(closes);
+                const bbVal = calcBollingerBands(closes);
+                
+                signals[tf] = evaluateSignal(lastPrice, rsiVal, bbVal);
+            }
+
+            const cleanName = symbol.replace('USDT', '');
+            rowsHtml += `
+                <tr>
+                    <td class="coin-cell">
+                        <div>
+                            <span class="coin-name">${cleanName}</span>
+                            <span class="coin-symbol">USDT Spot</span>
+                        </div>
+                    </td>
+                    <td><strong>$${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></td>
+                    <td>${signals['15m']}</td>
+                    <td>${signals['1h']}</td>
+                    <td>${signals['4h']}</td>
+                </tr>
+            `;
+        } catch (err) {
+            console.error(err);
+            const cleanName = symbol.replace('USDT', '');
+            rowsHtml += `
+                <tr>
+                    <td><span class="coin-name">${cleanName}</span></td>
+                    <td colspan="4" class="error">Data processing dropped due to rate limit protection.</td>
+                </tr>
+            `;
+        }
+    }
+
+    tableBody.innerHTML = rowsHtml;
+    const now = new Date();
+    updateTimeSpan.textContent = now.toLocaleTimeString() + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+scanBtn.addEventListener('click', runTechnicalScanner);
+window.addEventListener('DOMContentLoaded', runTechnicalScanner);

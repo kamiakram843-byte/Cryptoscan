@@ -1,572 +1,434 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1220">
-<title>Crypto Signal Scanner</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080e1d">
+<title>Crypto Scanner Advanced</title>
 <style>
-:root{color-scheme:dark;--bg:#080e1d;--panel:#141e31;--line:#2a3854;--text:#edf3ff;--muted:#a4b1c9;--blue:#4169f5;--green:#35d49a;--red:#ff657b;--yellow:#ffd166}
+:root{color-scheme:dark;--bg:#080e1d;--panel:#141e31;--line:#30405e;--text:#edf3ff;--muted:#a4b1c9;--green:#35d49a;--red:#ff657b;--yellow:#ffd166;--blue:#54b8ff;--purple:#b49aff}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,Arial,sans-serif}
-header{padding:20px 15px;background:linear-gradient(130deg,#17264a,#0b1324);border-bottom:1px solid var(--line)}
-h1{font-size:23px;margin:0 0 5px}
-header p{color:var(--muted);font-size:13px;margin:0}
-main{max-width:1200px;margin:auto;padding:12px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;margin-bottom:13px}
-.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;align-items:end}
-label{display:block;font-size:13px;color:#ccd7ec;margin-bottom:5px}
-select,input,button{width:100%;padding:11px;border:1px solid #405172;border-radius:9px;background:#202d46;color:white;font:inherit;min-height:42px}
-button{background:var(--blue);border:0;font-weight:750;cursor:pointer}
-button.secondary{background:#34445f}
-button:disabled{opacity:.55}
-.checks{display:flex;flex-wrap:wrap;gap:12px;margin-top:13px}
-.checks label{display:flex;align-items:center;gap:6px;margin:0}
+body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,Arial}
+header{padding:18px;background:#111d34;border-bottom:1px solid var(--line)}
+h1{font-size:23px;margin:0 0 5px}header p,.note{color:var(--muted);font-size:12px;line-height:1.5}
+main{max-width:1250px;margin:auto;padding:12px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:13px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;align-items:end}
+label{display:block;font-size:12px;color:#cbd6ec;margin-bottom:5px}
+input,select,button{width:100%;min-height:42px;padding:10px;border:1px solid #405172;border-radius:9px;background:#202d46;color:white;font:inherit}
+button{background:#4169f5;border:0;font-weight:bold}
+button.secondary{background:#35445e}
+.checks{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.checks label{display:flex;align-items:center;gap:5px;margin:0}
 .checks input{width:auto;min-height:auto}
-.status{color:var(--yellow);margin-top:12px;overflow-wrap:anywhere}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:13px}
-.stat{background:#0e1729;padding:12px;border-radius:12px;color:var(--muted);overflow-wrap:anywhere}
-.stat strong{display:block;color:white;font-size:22px;margin-top:4px}
-table{border-collapse:collapse;width:100%;min-width:850px}
-th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{color:#cbd6ec;font-size:13px}
+.status{color:var(--yellow);margin:10px 0;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:13px}
+.stat{background:#0c1527;border-radius:10px;padding:12px;color:var(--muted);font-size:12px}
+.stat strong{display:block;color:white;font-size:21px;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:850px){.grid{grid-template-columns:1.3fr 1fr}}
+@media(max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}main{padding:8px}header{padding:14px}h1{font-size:20px}}
+canvas{display:block;width:100%;height:240px;background:#0a1323;border-radius:8px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 12px;font-size:12px}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{display:inline-block;width:11px;height:4px;border-radius:3px}
+table{border-collapse:collapse;width:100%;min-width:970px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:#cbd6ec}
 .tablewrap{overflow-x:auto}
-a{color:#82aaff}
-.BUY{color:var(--green);font-weight:800}
-.SELL{color:var(--red);font-weight:800}
-.WAIT{color:var(--yellow);font-weight:700}
-.note{font-size:12px;color:var(--muted);line-height:1.55}
-canvas{width:100%;height:220px;display:block;background:#0b1425;border-radius:9px}
-.chartgrid{display:grid;grid-template-columns:1fr;gap:12px}
-.charttitle{font-weight:700;margin:0 0 8px}
-@media(min-width:800px){.chartgrid{grid-template-columns:1.4fr 1fr}}
-@media(max-width:500px){main{padding:9px}.panel{padding:11px}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:21px}}
+.BUY{color:var(--green);font-weight:800}.SELL{color:var(--red);font-weight:800}.WAIT{color:var(--yellow);font-weight:700}
+a{color:#8db5ff}
+#plan{line-height:1.7;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <header>
-<h1>Crypto Signal Scanner</h1>
-<p>Binance Spot public market data · No trading API key · Alert-only</p>
+<h1>Crypto Scanner Advanced</h1>
+<p>Binance Spot · Bollinger Bands · RSI · MACD · MA · ATR · Trend and alerts</p>
 </header>
 <main>
-
 <section class="panel">
 <div class="controls">
-<div><label for="quote">Quote market</label>
+<div><label for="quote">Market</label>
 <select id="quote"><option>USDT</option><option>USDC</option><option>BTC</option><option>FDUSD</option></select></div>
-
-<div><label for="limit">Coins to scan</label>
-<select id="limit">
-<option value="10">10 coins</option><option value="30">30 coins</option>
-<option value="60" selected>60 coins</option><option value="100">100 coins</option>
-<option value="200">200 coins</option><option value="all">All eligible coins</option>
-</select></div>
-
+<div><label for="limit">Number of coins</label>
+<select id="limit"><option>10</option><option>30</option><option selected>60</option><option>100</option><option>200</option></select></div>
 <div><label for="tf">Signal timeframe</label>
 <select id="tf"><option value="15m">15 minutes</option><option value="1h" selected>1 hour</option><option value="4h">4 hours</option></select></div>
-
-<div><label for="volume">Minimum 24h quote volume</label>
-<input id="volume" type="number" min="0" value="1000000"></div>
-
-<div><label for="filter">Show results</label>
-<select id="filter"><option value="ALL">All signals</option><option value="BUY">BUY only</option><option value="SELL">SELL only</option><option value="WAIT">WAIT only</option></select></div>
-
-<div><label for="interval">Auto scan</label>
-<select id="interval"><option value="0">Off</option><option value="1">Every 1 minute</option><option value="5">Every 5 minutes</option><option value="15">Every 15 minutes</option></select></div>
-
-<div><button id="scanBtn">SCAN MARKETS</button></div>
-<div><button id="stopBtn" class="secondary">STOP SCAN</button></div>
-<div><button id="bellBtn">🔔 ENABLE MOBILE ALERTS</button></div>
-<div><label>Notification status</label><div id="bellStatus" class="status">Alerts are off</div></div>
+<div><label for="minVol">Minimum 24h quote volume</label>
+<input id="minVol" type="number" value="1000000" min="0"></div>
+<div><label for="filter">Signal filter</label>
+<select id="filter"><option value="ALL">All</option><option>BUY</option><option>SELL</option><option>WAIT</option></select></div>
+<div><label for="auto">Auto scan</label>
+<select id="auto"><option value="0">Off</option><option value="1">1 minute</option><option value="5">5 minutes</option><option value="15">15 minutes</option></select></div>
+<div><button id="scan">SCAN MARKETS</button></div>
+<div><button class="secondary" id="stop">STOP SCAN</button></div>
+<div><button id="bell">🔔 ENABLE MOBILE ALERTS</button></div>
 </div>
-
 <div class="checks">
-<label><input type="checkbox" id="useConfirm"> Require 15m candle confirmation</label>
-<label><input type="checkbox" id="useTrend"> Require 4h MA trend confirmation</label>
-<label><input type="checkbox" id="showMA" checked> Show MA20/MA50</label>
-<label><input type="checkbox" id="showBB" checked> Show Bollinger Bands</label>
-<label><input type="checkbox" id="sound"> Sound alerts</label>
+<label><input id="confirm15" type="checkbox"> Require 15m confirmation</label>
+<label><input id="trend4" type="checkbox" checked> Confirm with 4h trend</label>
+<label><input id="showMA" type="checkbox" checked> Show MA20/MA50</label>
+<label><input id="showBB" type="checkbox" checked> Show all Bollinger Bands</label>
+<label><input id="sound" type="checkbox"> Sound alerts</label>
 </div>
-
 <div id="status" class="status">Ready. Tap SCAN MARKETS.</div>
+<div id="bellStatus" class="note">Mobile alerts are disabled.</div>
 <p class="note">
-BUY: the last fully closed candle touches the lower Bollinger Band AND RSI(14) is below 30.
-SELL: the candle touches the upper Bollinger Band AND RSI(14) is above 30.
-Optional confirmations can reduce signal counts. Signals are not guaranteed predictions.
+Signals use completed candles. BUY and SELL are setups to investigate, not guaranteed profitable trades.
+A SELL label means a possible spot exit; this scanner does not open short positions or place orders.
 </p>
 </section>
 
 <div class="stats">
 <div class="stat">Scanned<strong id="scanned">0</strong></div>
-<div class="stat">BUY<strong id="buys">0</strong></div>
-<div class="stat">SELL<strong id="sells">0</strong></div>
-<div class="stat">Updated<strong id="updated">—</strong></div>
+<div class="stat">BUY setups<strong id="buys">0</strong></div>
+<div class="stat">SELL setups<strong id="sells">0</strong></div>
+<div class="stat">Last scan<strong id="updated">—</strong></div>
 </div>
 
 <section class="panel">
+<h3>Coin chart and indicators</h3>
 <div class="controls">
-<div><label for="chartCoin">Chart coin</label>
-<select id="chartCoin"><option value="BTCUSDT">BTCUSDT</option></select></div>
+<div><label for="coin">Coin</label><select id="coin"><option>BTCUSDT</option></select></div>
 <div><label for="chartTf">Chart timeframe</label>
-<select id="chartTf"><option value="15m">15 minutes</option><option value="1h" selected>1 hour</option><option value="4h">4 hours</option></select></div>
-<div><label for="candles">Candles</label>
-<select id="candles"><option>30</option><option selected>50</option><option>100</option></select></div>
+<select id="chartTf"><option value="15m">15m</option><option value="1h" selected>1h</option><option value="4h">4h</option></select></div>
+<div><label for="chartCount">Candles</label>
+<select id="chartCount"><option>30</option><option selected>60</option><option>100</option></select></div>
 <div><button id="loadChart">LOAD CHART</button></div>
 </div>
-<div class="chartgrid" style="margin-top:14px">
-<div><p id="priceTitle" class="charttitle">Price chart · candles / MA / Bollinger Bands</p><canvas id="priceCanvas" height="220"></canvas></div>
-<div><p id="rsiTitle" class="charttitle">RSI(14)</p><canvas id="rsiCanvas" height="220"></canvas></div>
+<div class="legend">
+<span><i class="dot" style="background:#b49aff"></i>Upper BB</span>
+<span><i class="dot" style="background:#ffd166"></i>Middle BB (20 SMA)</span>
+<span><i class="dot" style="background:#54b8ff"></i>Lower BB</span>
+<span><i class="dot" style="background:#35d49a"></i>Bull candle</span>
+<span><i class="dot" style="background:#ff657b"></i>Bear candle</span>
 </div>
-<p class="note">MA means moving average; RSI means relative strength index. This is a lightweight chart, not a full TradingView chart.</p>
+<div class="grid">
+<div><b id="priceTitle">Price and Bollinger Bands</b><canvas id="priceChart" height="240"></canvas></div>
+<div><b id="rsiTitle">RSI(14)</b><canvas id="rsiChart" height="240"></canvas>
+<p class="note">RSI guide: below 30 = oversold; above 70 = overbought. Neither level guarantees a reversal.</p></div>
+</div>
 </section>
 
 <section class="panel">
+<h3>Entry and exit plan</h3>
+<div id="plan">Select a coin in the chart menu and load its chart, or scan the market.</div>
+<p class="note">ATR-based prices are estimates from historical volatility, not guaranteed support, resistance or targets. Account for trading fees and slippage.</p>
+</section>
+
+<section class="panel">
+<h3>Market scanner results</h3>
 <div class="tablewrap">
 <table>
-<thead><tr>
-<th>Coin</th><th>Signal</th><th>Price</th><th>RSI</th>
-<th>MA20</th><th>MA50</th><th>BB lower</th><th>BB upper</th>
-<th>24h quote volume</th><th>Reason</th>
-</tr></thead>
-<tbody id="rows"><tr><td colspan="10">No scan results yet.</td></tr></tbody>
+<thead><tr><th>Coin</th><th>Signal</th><th>Trend</th><th>Price</th><th>RSI</th><th>MACD</th><th>Upper BB</th><th>Middle BB</th><th>Lower BB</th><th>Suggested entry</th><th>Stop estimate</th><th>Target estimate</th><th>Reason</th></tr></thead>
+<tbody id="rows"><tr><td colspan="13">No scan results yet.</td></tr></tbody>
 </table>
 </div>
 </section>
 
 <section class="panel note">
-<b>Mobile notifications:</b> Allow notifications after tapping the bell. Notifications may work while the page is active or can be resumed. This page does not run a market scanner on a server and cannot guarantee alerts when the phone closes or suspends the page. SMS and automatic trading are not included.
+<b>Important:</b> This is a technical-analysis aid, not a price prediction engine. It uses Binance public Spot data and needs an internet connection. It cannot know future prices or news. Browser alerts require permission and the page may need to remain open; this static site does not guarantee notifications after Chrome is closed.
 </section>
 </main>
 
 <script>
 "use strict";
-
 const API="https://data-api.binance.vision/api/v3";
 const $=id=>document.getElementById(id);
-
-let stopRequested=false;
-let autoTimer=null;
-let results=[];
-let lastSignals=new Set();
-let mobileAlertsEnabled=false;
-let swRegistration=null;
+let results=[],stopRequested=false,autoTimer=null,lastSignals=new Set();
+let alertsEnabled=false,registration=null;
 
 async function getJSON(url){
- const response=await fetch(url,{cache:"no-store"});
- if(!response.ok)throw new Error("HTTP "+response.status);
- return response.json();
+ const r=await fetch(url,{cache:"no-store"});
+ if(!r.ok)throw new Error("API error "+r.status);
+ return r.json();
 }
-
-function fmt(value,digits=5){
- return Number.isFinite(value)
-  ?value.toLocaleString("en-US",{maximumFractionDigits:digits})
-  :"—";
+const fmt=(n,d=5)=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:d}):"—";
+function sma(a,n){return a.length<n?NaN:a.slice(-n).reduce((s,x)=>s+x,0)/n}
+function emaSeries(a,n){
+ const out=Array(a.length).fill(NaN);
+ if(a.length<n)return out;
+ let e=a.slice(0,n).reduce((s,x)=>s+x,0)/n;
+ out[n-1]=e;const k=2/(n+1);
+ for(let i=n;i<a.length;i++){e=a[i]*k+e*(1-k);out[i]=e}
+ return out;
 }
-
-function sma(values,n){
- if(values.length<n)return NaN;
- return values.slice(-n).reduce((sum,v)=>sum+v,0)/n;
-}
-
-function rsi(values,n=14){
- if(values.length<n+1)return NaN;
- let gains=0,losses=0;
- for(let i=values.length-n;i<values.length;i++){
-  const diff=values[i]-values[i-1];
-  if(diff>0)gains+=diff;
-  else losses-=diff;
+function rsi(a,n=14){
+ if(a.length<n+1)return NaN;
+ let g=0,l=0;
+ for(let i=a.length-n;i<a.length;i++){
+  const d=a[i]-a[i-1];if(d>0)g+=d;else l-=d;
  }
- if(losses===0)return gains===0?50:100;
- return 100-100/(1+gains/losses);
+ if(l===0)return g===0?50:100;
+ return 100-100/(1+g/l);
 }
-
-function boll(values,n=20){
- if(values.length<n)return {mid:NaN,upper:NaN,lower:NaN};
- const part=values.slice(-n);
- const mean=part.reduce((s,v)=>s+v,0)/n;
- const sd=Math.sqrt(part.reduce((s,v)=>s+(v-mean)**2,0)/n);
- return {mid:mean,upper:mean+2*sd,lower:mean-2*sd};
+function boll(a,n=20){
+ if(a.length<n)return {mid:NaN,upper:NaN,lower:NaN};
+ const v=a.slice(-n),m=v.reduce((s,x)=>s+x,0)/n;
+ const sd=Math.sqrt(v.reduce((s,x)=>s+(x-m)**2,0)/n);
+ return {mid:m,upper:m+2*sd,lower:m-2*sd};
 }
-
-async function fetchCandles(symbol,timeframe,limit=100){
- const data=await getJSON(
-  `${API}/klines?symbol=${encodeURIComponent(symbol)}&interval=${timeframe}&limit=${limit}`
- );
- return data.map(k=>({
-  time:+k[0],open:+k[1],high:+k[2],
-  low:+k[3],close:+k[4],volume:+k[5]
- }));
+function atr(cs,n=14){
+ if(cs.length<n+1)return NaN;
+ const tr=[];
+ for(let i=1;i<cs.length;i++){
+  const c=cs[i],p=cs[i-1];
+  tr.push(Math.max(c.high-c.low,Math.abs(c.high-p.close),Math.abs(c.low-p.close)));
+ }
+ return sma(tr,n);
 }
-
-function analyze(candles){
- const closed=candles.length>1?candles.slice(0,-1):candles;
- const closes=closed.map(c=>c.close);
- const last=closed[closed.length-1];
- const bands=boll(closes);
+function macd(a){
+ const e12=emaSeries(a,12),e26=emaSeries(a,26);
+ const line=a.map((_,i)=>Number.isFinite(e12[i])&&Number.isFinite(e26[i])?e12[i]-e26[i]:NaN);
+ const valid=line.filter(Number.isFinite),sigValid=emaSeries(valid,9);
+ const signal=sigValid.length?sigValid[sigValid.length-1]:NaN;
+ return {line:line[line.length-1],signal,hist:line[line.length-1]-signal};
+}
+async function getCandles(symbol,tf,limit=100){
+ const d=await getJSON(`${API}/klines?symbol=${encodeURIComponent(symbol)}&interval=${tf}&limit=${limit}`);
+ return d.map(k=>({time:+k[0],open:+k[1],high:+k[2],low:+k[3],close:+k[4],volume:+k[5]}));
+}
+function calc(cs){
+ const closed=cs.length>1?cs.slice(0,-1):cs;
+ const closes=closed.map(c=>c.close),last=closed[closed.length-1];
+ const bb=boll(closes),m=macd(closes);
  return {
-  last,rsi:rsi(closes),ma20:sma(closes,20),ma50:sma(closes,50),
-  ...bands,
-  lowerTouch:!!last&&last.low<=bands.lower,
-  upperTouch:!!last&&last.high>=bands.upper
+  candles:closed,last,price:last?.close,
+  rsi:rsi(closes),ma20:sma(closes,20),ma50:sma(closes,50),
+  ...bb,atr:atr(closed),macd:m,
+  lowerTouch:!!last&&last.low<=bb.lower,
+  upperTouch:!!last&&last.high>=bb.upper,
+  upperReject:!!last&&last.high>=bb.upper&&last.close<bb.upper,
+  lowerReject:!!last&&last.low<=bb.lower&&last.close>bb.lower,
+  breakoutUp:!!last&&last.close>bb.upper,
+  breakoutDown:!!last&&last.close<bb.lower
  };
 }
-
-async function getSignal(symbol,lastPrice,volume,timeframe){
- const a=analyze(await fetchCandles(symbol,timeframe,100));
- let signal="WAIT";
- let reason="No complete setup";
-
- if(a.lowerTouch&&a.rsi<30){
-  signal="BUY";
-  reason=`Lower BB touched; RSI ${fmt(a.rsi,1)} is below 30`;
- }else if(a.upperTouch&&a.rsi>30){
-  signal="SELL";
-  reason=`Upper BB touched; RSI ${fmt(a.rsi,1)} is above 30`;
- }
-
- if(signal!=="WAIT"&&$("useConfirm").checked){
-  const confirmation=analyze(await fetchCandles(symbol,"15m",50));
-  if(signal==="BUY"&&!(confirmation.last&&confirmation.last.close>confirmation.last.open)){
-   signal="WAIT";
-   reason="Setup found, but 15m candle is not bullish";
-  }
-  if(signal==="SELL"&&!(confirmation.last&&confirmation.last.close<confirmation.last.open)){
-   signal="WAIT";
-   reason="Setup found, but 15m candle is not bearish";
-  }
- }
-
- if(signal==="BUY"&&$("useTrend").checked){
-  const trend=analyze(await fetchCandles(symbol,"4h",100));
-  if(!(trend.ma20>trend.ma50)){
-   signal="WAIT";
-   reason="Setup found, but 4h MA20 is not above MA50";
-  }
- }
-
- return {
-  symbol,price:lastPrice,volume,signal,reason,
-  rsi:a.rsi,ma20:a.ma20,ma50:a.ma50,lower:a.lower,upper:a.upper
- };
+function trendOf(a){
+ if(a.ma20>a.ma50&&a.price>a.ma20&&a.macd.hist>0)return "STRONG UP";
+ if(a.ma20>a.ma50)return "UP";
+ if(a.ma20<a.ma50&&a.price<a.ma20&&a.macd.hist<0)return "STRONG DOWN";
+ if(a.ma20<a.ma50)return "DOWN";
+ return "SIDEWAYS";
 }
-
-function updateStats(){
+async function analyzeCoin(symbol,price,volume,tf){
+ const cs=await getCandles(symbol,tf,110),a=calc(cs);
+ let signal="WAIT",reason="No confirmed setup";
+ const trend=trendOf(a);
+ // Rejection setups require a wick touching a band and a close back inside.
+ if(a.lowerReject&&a.rsi<35&&a.macd.hist>0){
+  signal="BUY";reason="Lower-band rejection + RSI recovery + MACD momentum";
+ }else if(a.upperReject&&a.rsi>60&&a.macd.hist<0){
+  signal="SELL";reason="Upper-band rejection + RSI elevated + weakening MACD";
+ }else if(a.breakoutUp){
+  reason="Close above upper band: possible breakout; avoid automatic SELL";
+ }else if(a.breakoutDown){
+  reason="Close below lower band: possible breakdown; avoid automatic BUY";
+ }else if(a.lowerTouch&&a.rsi<30){
+  reason="Oversold/lower-band touch, but reversal not yet confirmed";
+ }else if(a.upperTouch&&a.rsi>70){
+  reason="Overbought/upper-band touch, but rejection not yet confirmed";
+ }
+ if(signal==="BUY"&&$("confirm15").checked){
+  const x=calc(await getCandles(symbol,"15m",60));
+  if(!(x.last&&x.last.close>x.last.open&&x.macd.hist>0)){
+   signal="WAIT";reason="Potential BUY, but 15m confirmation is missing";
+  }
+ }
+ if(signal==="BUY"&&$("trend4").checked){
+  const x=calc(await getCandles(symbol,"4h",100));
+  if(!(x.ma20>x.ma50)){
+   signal="WAIT";reason="Potential BUY, but 4h MA20 is not above MA50";
+  }
+ }
+ if(signal==="SELL"&&$("trend4").checked){
+  const x=calc(await getCandles(symbol,"4h",100));
+  if(x.ma20>x.ma50){
+   signal="WAIT";reason="Upper-band rejection, but 4h trend remains bullish";
+  }
+ }
+ // Illustrative ATR-based plan. Entry is only a candidate, never an order.
+ let entry=NaN,stop=NaN,target=NaN;
+ if(Number.isFinite(a.atr)&&a.atr>0){
+  if(signal==="BUY"){
+   entry=a.last.close;stop=entry-1.5*a.atr;target=entry+2*a.atr;
+  }else if(signal==="SELL"){
+   entry=a.last.close;stop=entry+1.5*a.atr;target=entry-2*a.atr;
+  }
+ }
+ return {symbol,price,volume,signal,reason,trend,rsi:a.rsi,ma20:a.ma20,ma50:a.ma50,
+  upper:a.upper,mid:a.mid,lower:a.lower,atr:a.atr,entry,stop,target,analysis:a};
+}
+function render(){
+ const f=$("filter").value;
+ const list=results.filter(x=>f==="ALL"||x.signal===f);
+ $("rows").innerHTML=list.map(x=>`<tr>
+ <td><a target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=BINANCE%3A${encodeURIComponent(x.symbol)}">${x.symbol}</a></td>
+ <td class="${x.signal}">${x.signal}</td><td>${x.trend}</td><td>${fmt(x.price,8)}</td>
+ <td>${fmt(x.rsi,1)}</td><td>${fmt(x.analysis.macd.hist,8)}</td>
+ <td>${fmt(x.upper,8)}</td><td>${fmt(x.mid,8)}</td><td>${fmt(x.lower,8)}</td>
+ <td>${fmt(x.entry,8)}</td><td>${fmt(x.stop,8)}</td><td>${fmt(x.target,8)}</td><td>${x.reason}</td></tr>`).join("")
+ ||'<tr><td colspan="13">No results for this filter.</td></tr>';
+ const coins=[...new Set(results.map(x=>x.symbol))],old=$("coin").value;
+ $("coin").innerHTML=(coins.length?coins:["BTCUSDT"]).map(s=>`<option>${s}</option>`).join("");
+ if(coins.includes(old))$("coin").value=old;
  $("scanned").textContent=results.length;
  $("buys").textContent=results.filter(x=>x.signal==="BUY").length;
  $("sells").textContent=results.filter(x=>x.signal==="SELL").length;
  $("updated").textContent=new Date().toLocaleTimeString();
 }
-
-function renderRows(){
- const filter=$("filter").value;
- const shown=results.filter(x=>filter==="ALL"||x.signal===filter);
-
- $("rows").innerHTML=shown.map(x=>`<tr>
- <td><a target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=BINANCE%3A${encodeURIComponent(x.symbol)}">${x.symbol}</a></td>
- <td class="${x.signal}">${x.signal}</td>
- <td>${fmt(x.price,8)}</td><td>${fmt(x.rsi,1)}</td>
- <td>${fmt(x.ma20,8)}</td><td>${fmt(x.ma50,8)}</td>
- <td>${fmt(x.lower,8)}</td><td>${fmt(x.upper,8)}</td>
- <td>${fmt(x.volume,0)}</td><td>${x.reason}</td></tr>`).join("")
- ||'<tr><td colspan="10">No results match this filter.</td></tr>';
-
- const symbols=[...new Set(results.map(x=>x.symbol))];
- const previous=$("chartCoin").value;
- $("chartCoin").innerHTML=(symbols.length?symbols:["BTCUSDT"])
-  .map(s=>`<option value="${s}">${s}</option>`).join("");
- if(symbols.includes(previous))$("chartCoin").value=previous;
-}
-
 async function scanMarkets(){
- if($("scanBtn").disabled)return;
- stopRequested=false;
- $("scanBtn").disabled=true;
+ if($("scan").disabled)return;
+ stopRequested=false;$("scan").disabled=true;
  $("status").textContent="Loading market list…";
-
  try{
   const [tickers,info]=await Promise.all([
-   getJSON(API+"/ticker/24hr"),
-   getJSON(API+"/exchangeInfo")
+   getJSON(API+"/ticker/24hr"),getJSON(API+"/exchangeInfo")
   ]);
-
-  const quote=$("quote").value;
-  const minVolume=Number($("volume").value)||0;
-
-  const allowed=new Set(info.symbols
-   .filter(s=>s.status==="TRADING"&&s.isSpotTradingAllowed&&s.quoteAsset===quote)
-   .map(s=>s.symbol));
-
-  let markets=tickers
-   .filter(t=>allowed.has(t.symbol)&&Number(t.quoteVolume)>=minVolume)
-   .sort((a,b)=>Number(b.quoteVolume)-Number(a.quoteVolume));
-
-  const chosen=$("limit").value;
-  if(chosen!=="all")markets=markets.slice(0,Number(chosen));
-
-  results=[];
-  const total=markets.length;
-  $("status").textContent=`Analyzing ${total} coins on ${$("tf").value}…`;
-
-  // Small batches reduce simultaneous API requests.
-  for(let i=0;i<markets.length&&!stopRequested;i+=4){
-   const batch=markets.slice(i,i+4);
-
-   const batchResults=await Promise.all(batch.map(async market=>{
-    try{
-     return await getSignal(
-      market.symbol,Number(market.lastPrice),
-      Number(market.quoteVolume),$("tf").value
-     );
-    }catch(error){
-     return {
-      symbol:market.symbol,price:Number(market.lastPrice),
-      volume:Number(market.quoteVolume),signal:"WAIT",
-      reason:"Data unavailable: "+error.message,
-      rsi:NaN,ma20:NaN,ma50:NaN,lower:NaN,upper:NaN
-     };
-    }
+  const quote=$("quote").value,min=Number($("minVol").value)||0;
+  const allowed=new Set(info.symbols.filter(s=>s.status==="TRADING"&&s.isSpotTradingAllowed&&s.quoteAsset===quote).map(s=>s.symbol));
+  let markets=tickers.filter(t=>allowed.has(t.symbol)&&Number(t.quoteVolume)>=min)
+   .sort((a,b)=>Number(b.quoteVolume)-Number(a.quoteVolume))
+   .slice(0,Number($("limit").value));
+  results=[];$("status").textContent=`Analyzing ${markets.length} coins…`;
+  for(let i=0;i<markets.length&&!stopRequested;i+=3){
+   const batch=markets.slice(i,i+3);
+   const part=await Promise.all(batch.map(async t=>{
+    try{return await analyzeCoin(t.symbol,+t.lastPrice,+t.quoteVolume,$("tf").value)}
+    catch(e){return {symbol:t.symbol,price:+t.lastPrice,volume:+t.quoteVolume,signal:"WAIT",reason:"Data error: "+e.message,trend:"UNKNOWN",rsi:NaN,ma20:NaN,ma50:NaN,upper:NaN,mid:NaN,lower:NaN,entry:NaN,stop:NaN,target:NaN,analysis:{macd:{hist:NaN}}};}
    }));
-
-   results.push(...batchResults);
-   updateStats();
-   renderRows();
-   $("status").textContent=
-    `Analyzed ${results.length} / ${total} coins${stopRequested?" — stop requested":""}`;
+   results.push(...part);render();
+   $("status").textContent=`Analyzed ${results.length}/${markets.length}`;
   }
-
-  updateStats();
-  renderRows();
-  await alertNewSignals();
-
-  if(!stopRequested){
-   $("status").textContent=
-    `Finished: ${results.length} coins. BUY ${results.filter(x=>x.signal==="BUY").length}; SELL ${results.filter(x=>x.signal==="SELL").length}.`;
-  }
- }catch(error){
-  $("status").textContent="Error: "+error.message+". Check internet and reload the page.";
- }finally{
-  $("scanBtn").disabled=false;
- }
+  render();await notifySignals();
+  $("status").textContent=`Finished ${results.length} coins. BUY ${results.filter(x=>x.signal==="BUY").length}; SELL ${results.filter(x=>x.signal==="SELL").length}.`;
+ }catch(e){$("status").textContent="Error: "+e.message+". Check connection and retry."}
+ finally{$("scan").disabled=false}
 }
-
-/* Mobile notification permission and service worker */
-async function enableMobileAlerts(){
- const status=$("bellStatus");
-
- if(!("Notification" in window)){
-  status.textContent="This browser does not support notifications.";
-  return;
- }
- if(!("serviceWorker" in navigator)){
-  status.textContent="Service workers are not supported.";
-  return;
- }
-
- try{
-  const permission=await Notification.requestPermission();
-  if(permission!=="granted"){
-   status.textContent="Permission denied. Allow notifications in Android/Chrome settings.";
-   return;
-  }
-
-  swRegistration=await navigator.serviceWorker.register("./sw.js");
-  await navigator.serviceWorker.ready;
-  mobileAlertsEnabled=true;
-  status.textContent="🔔 Mobile alerts enabled";
-
-  await swRegistration.showNotification("Crypto Scanner test",{
-   body:"Mobile notification setup is working.",
-   tag:"crypto-scanner-test"
-  });
- }catch(error){
-  status.textContent="Notification setup failed: "+error.message;
- }
+function setupCanvas(c){
+ const w=c.clientWidth||320,h=240,dpr=window.devicePixelRatio||1;
+ c.width=w*dpr;c.height=h*dpr;
+ const ctx=c.getContext("2d");ctx.scale(dpr,dpr);return {ctx,w,h};
 }
-
-async function sendMobileAlert(title,message){
- if(!mobileAlertsEnabled||!("Notification" in window)||Notification.permission!=="granted")return;
-
- try{
-  if(!swRegistration)swRegistration=await navigator.serviceWorker.ready;
-  await swRegistration.showNotification(title,{
-   body:message,tag:title+"-"+message,renotify:false
-  });
- }catch(error){
-  console.error("Notification error",error);
- }
+function line(ctx,a,x,y,color,width=1.5){
+ ctx.beginPath();let started=false;
+ a.forEach((v,i)=>{if(!Number.isFinite(v))return;if(!started){ctx.moveTo(x(i),y(v));started=true}else ctx.lineTo(x(i),y(v));});
+ ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();
 }
-
-async function alertNewSignals(){
- const active=new Set(results
-  .filter(x=>x.signal==="BUY"||x.signal==="SELL")
-  .map(x=>x.symbol+":"+x.signal));
-
- const fresh=[...active].filter(s=>!lastSignals.has(s));
- lastSignals=active;
-
- for(const item of fresh){
-  const [symbol,signal]=item.split(":");
-  await sendMobileAlert(
-   signal==="BUY"?"🟢 CRYPTO BUY SIGNAL":"🔴 CRYPTO SELL SIGNAL",
-   `${symbol}: ${signal} signal detected. Check the chart before trading.`
-  );
-  if($("sound").checked)playAlertSound();
- }
-}
-
-function playAlertSound(){
- try{
-  const context=new (window.AudioContext||window.webkitAudioContext)();
-  const oscillator=context.createOscillator();
-  const gain=context.createGain();
-  oscillator.connect(gain);
-  gain.connect(context.destination);
-  oscillator.frequency.value=850;
-  gain.gain.value=.12;
-  oscillator.start();
-  oscillator.stop(context.currentTime+.3);
- }catch(e){}
-}
-
-/* Lightweight price and RSI charts */
-function setupCanvas(canvas){
- const width=canvas.clientWidth||320,height=220;
- const dpr=window.devicePixelRatio||1;
- canvas.width=width*dpr;
- canvas.height=height*dpr;
- const ctx=canvas.getContext("2d");
- ctx.scale(dpr,dpr);
- return {ctx,width,height};
-}
-
-function drawLine(ctx,arr,x,y,color,width=1.5){
- ctx.beginPath();
- let started=false;
- arr.forEach((v,i)=>{
-  if(!Number.isFinite(v))return;
-  if(!started){ctx.moveTo(x(i),y(v));started=true;}
-  else ctx.lineTo(x(i),y(v));
- });
- ctx.strokeStyle=color;
- ctx.lineWidth=width;
- ctx.stroke();
-}
-
-function drawPriceChart(cs){
- const {ctx,width:w,height:h}=setupCanvas($("priceCanvas"));
- ctx.clearRect(0,0,w,h);
- if(!cs.length)return;
-
- const closes=cs.map(c=>c.close);
- const bands=cs.map((c,i)=>boll(closes.slice(0,i+1)));
- const ma20=cs.map((c,i)=>sma(closes.slice(0,i+1),20));
- const ma50=cs.map((c,i)=>sma(closes.slice(0,i+1),50));
-
- const values=cs.flatMap((c,i)=>[
-  c.low,c.high,bands[i].upper,bands[i].lower,ma20[i],ma50[i]
- ]).filter(Number.isFinite);
-
- let min=Math.min(...values),max=Math.max(...values);
- if(!Number.isFinite(min)||!Number.isFinite(max))return;
- if(min===max){min-=1;max+=1;}
-
- const x=i=>24+i*(w-34)/Math.max(1,cs.length-1);
- const y=v=>h-18-(v-min)/(max-min)*(h-36);
-
- ctx.strokeStyle="#2b3a55";
- for(let j=0;j<5;j++){
-  const yy=18+j*(h-36)/4;
-  ctx.beginPath();ctx.moveTo(23,yy);ctx.lineTo(w-5,yy);ctx.stroke();
- }
-
+function drawPrice(cs){
+ const {ctx,w,h}=setupCanvas($("priceChart"));ctx.clearRect(0,0,w,h);
+ const close=cs.map(c=>c.close);
+ const bands=cs.map((c,i)=>boll(close.slice(0,i+1)));
+ const ma20=cs.map((c,i)=>sma(close.slice(0,i+1),20));
+ const ma50=cs.map((c,i)=>sma(close.slice(0,i+1),50));
+ const vals=cs.flatMap((c,i)=>[c.low,c.high,bands[i].upper,bands[i].mid,bands[i].lower,ma20[i],ma50[i]]).filter(Number.isFinite);
+ if(!vals.length)return;
+ let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min-=1;max+=1}
+ const x=i=>25+i*(w-34)/Math.max(1,cs.length-1),y=v=>h-18-(v-min)/(max-min)*(h-36);
+ ctx.strokeStyle="#293750";
+ for(let j=0;j<5;j++){let yy=18+j*(h-36)/4;ctx.beginPath();ctx.moveTo(24,yy);ctx.lineTo(w-5,yy);ctx.stroke()}
  cs.forEach((c,i)=>{
-  const xx=x(i),yo=y(c.open),yc=y(c.close);
+  let xx=x(i),yo=y(c.open),yc=y(c.close);
   ctx.strokeStyle=c.close>=c.open?"#35d49a":"#ff657b";
   ctx.beginPath();ctx.moveTo(xx,y(c.high));ctx.lineTo(xx,y(c.low));ctx.stroke();
-  ctx.fillStyle=ctx.strokeStyle;
-  ctx.fillRect(xx-2,Math.min(yo,yc),4,Math.max(1,Math.abs(yc-yo)));
+  ctx.fillStyle=ctx.strokeStyle;ctx.fillRect(xx-2,Math.min(yo,yc),4,Math.max(1,Math.abs(yc-yo)));
  });
-
  if($("showBB").checked){
-  drawLine(ctx,bands.map(b=>b.upper),x,y,"#9b8cff",1);
-  drawLine(ctx,bands.map(b=>b.lower),x,y,"#9b8cff",1);
-  drawLine(ctx,bands.map(b=>b.mid),x,y,"#6b7b9b",1);
+  line(ctx,bands.map(b=>b.upper),x,y,"#b49aff",2);
+  line(ctx,bands.map(b=>b.mid),x,y,"#ffd166",2);
+  line(ctx,bands.map(b=>b.lower),x,y,"#54b8ff",2);
  }
  if($("showMA").checked){
-  drawLine(ctx,ma20,x,y,"#ffd166",1.5);
-  drawLine(ctx,ma50,x,y,"#54b8ff",1.5);
+  line(ctx,ma20,x,y,"#f59e0b",1);
+  line(ctx,ma50,x,y,"#e879f9",1);
  }
-
- ctx.fillStyle="#dce6f8";
- ctx.font="10px system-ui";
- ctx.fillText(fmt(max,6),2,12);
- ctx.fillText(fmt(min,6),2,h-3);
+ ctx.fillStyle="#dce6f8";ctx.font="10px system-ui";
+ ctx.fillText("High "+fmt(max,6),2,12);ctx.fillText("Low "+fmt(min,6),2,h-3);
 }
-
-function drawRSIChart(cs){
- const {ctx,width:w,height:h}=setupCanvas($("rsiCanvas"));
- ctx.clearRect(0,0,w,h);
- if(!cs.length)return;
-
- const vals=cs.map((c,i)=>rsi(cs.slice(0,i+1).map(k=>k.close)));
- const x=i=>24+i*(w-30)/Math.max(1,vals.length-1);
- const y=v=>h-18-v/100*(h-36);
-
+function drawRSI(cs){
+ const {ctx,w,h}=setupCanvas($("rsiChart"));ctx.clearRect(0,0,w,h);
+ const values=cs.map((c,i)=>rsi(cs.slice(0,i+1).map(z=>z.close)));
+ const x=i=>24+i*(w-30)/Math.max(1,values.length-1),y=v=>h-18-v/100*(h-36);
  [30,50,70].forEach(v=>{
-  ctx.beginPath();
-  ctx.moveTo(22,y(v));ctx.lineTo(w-5,y(v));
-  ctx.strokeStyle=v===50?"#2b3a55":"#6c5570";
+  ctx.beginPath();ctx.moveTo(22,y(v));ctx.lineTo(w-5,y(v));
+  ctx.strokeStyle=v===50?"#293750":"#806184";
   ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle="#aab7cf";ctx.font="10px system-ui";
-  ctx.fillText(v,2,y(v)+3);
+  ctx.fillStyle="#cbd6ec";ctx.font="11px system-ui";ctx.fillText(v,2,y(v)+3);
  });
- drawLine(ctx,vals,x,y,"#54b8ff",2);
+ line(ctx,values,x,y,"#54b8ff",2);
 }
-
+function makePlan(a,symbol,tf){
+ const trend=trendOf(a);
+ let text=`<b>${symbol} · ${tf}</b><br>Trend: <b>${trend}</b><br>
+ Last closed candle: ${a.last?new Date(a.last.time).toLocaleString():"—"}<br>
+ Close: ${fmt(a.price,8)}<br>
+ Upper BB: ${fmt(a.upper,8)} · Middle BB: ${fmt(a.mid,8)} · Lower BB: ${fmt(a.lower,8)}<br>
+ RSI(14): ${fmt(a.rsi,1)} · MACD histogram: ${fmt(a.macd.hist,8)} · ATR(14): ${fmt(a.atr,8)}<br>`;
+ if(a.lowerReject)text+="<b>Lower-band rejection:</b> possible bounce, but confirm momentum before buying.<br>";
+ if(a.upperReject)text+="<b>Upper-band rejection:</b> possible pullback, but confirm weakness before selling.<br>";
+ if(a.breakoutUp)text+="<b>Breakout watch:</b> candle closed above upper band. Avoid automatically selling; check volume and retest.<br>";
+ if(a.breakoutDown)text+="<b>Breakdown watch:</b> candle closed below lower band. Avoid automatically buying; check support and retest.<br>";
+ text+="<br><b>Timing:</b> Wait for the selected candle to close. Consider entry only after the setup is confirmed on the next candle or a retest. There is no reliable fixed clock time to buy or sell.";
+ $("plan").innerHTML=text;
+}
 async function loadChart(){
  $("loadChart").disabled=true;
  try{
-  const symbol=$("chartCoin").value;
-  const tf=$("chartTf").value;
-  const count=Number($("candles").value);
-  const data=await fetchCandles(symbol,tf,count+60);
-
-  drawPriceChart(data.slice(-count));
-  drawRSIChart(data.slice(-count));
-
-  $("priceTitle").textContent=`${symbol} · ${tf} price / MA / BB`;
+  const symbol=$("coin").value,tf=$("chartTf").value,n=Number($("chartCount").value);
+  const data=await getCandles(symbol,tf,n+60);
+  const closed=data.slice(0,-1);
+  drawPrice(closed.slice(-n));drawRSI(closed.slice(-n));
+  $("priceTitle").textContent=`${symbol} · ${tf} candles and Bollinger Bands`;
   $("rsiTitle").textContent=`${symbol} · ${tf} RSI(14)`;
- }catch(error){
-  $("status").textContent="Chart error: "+error.message;
- }finally{
-  $("loadChart").disabled=false;
+  makePlan(calc(closed),symbol,tf);
+ }catch(e){$("status").textContent="Chart error: "+e.message}
+ finally{$("loadChart").disabled=false}
+}
+async function enableAlerts(){
+ try{
+  if(!("Notification" in window)||!("serviceWorker" in navigator)){
+   $("bellStatus").textContent="Notifications not supported in this browser.";return;
+  }
+  const permission=await Notification.requestPermission();
+  if(permission!=="granted"){$("bellStatus").textContent="Please allow notifications in Chrome settings.";return}
+  registration=await navigator.serviceWorker.register("./sw.js");
+  await navigator.serviceWorker.ready;
+  alertsEnabled=true;
+  $("bellStatus").textContent="🔔 Alerts enabled. Test notification sent.";
+  await registration.showNotification("Crypto Scanner",{body:"Mobile alert test successful."});
+ }catch(e){$("bellStatus").textContent="Alert setup failed: "+e.message}
+}
+async function notifySignals(){
+ const now=new Set(results.filter(x=>x.signal==="BUY"||x.signal==="SELL").map(x=>x.symbol+":"+x.signal));
+ const fresh=[...now].filter(s=>!lastSignals.has(s));lastSignals=now;
+ for(const s of fresh){
+  const [coin,signal]=s.split(":");
+  if(alertsEnabled&&registration){
+   await registration.showNotification(signal==="BUY"?"🟢 BUY SETUP":"🔴 SELL SETUP",{
+    body:`${coin}: ${signal} setup. Check chart, trend and risk before acting.`,
+    tag:s
+   });
+  }
+  if($("sound").checked){
+   try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);g.gain.value=.1;o.start();o.stop(c.currentTime+.25)}catch(e){}
+  }
  }
 }
-
-$("scanBtn").addEventListener("click",scanMarkets);
-$("stopBtn").addEventListener("click",()=>{
- stopRequested=true;
- $("status").textContent="Stop requested; current batch will finish.";
-});
-$("bellBtn").addEventListener("click",enableMobileAlerts);
-$("filter").addEventListener("change",renderRows);
+$("scan").addEventListener("click",scanMarkets);
+$("stop").addEventListener("click",()=>{stopRequested=true;$("status").textContent="Stop requested; current batch will finish."});
+$("bell").addEventListener("click",enableAlerts);
+$("filter").addEventListener("change",render);
 $("loadChart").addEventListener("click",loadChart);
-
-$("interval").addEventListener("change",()=>{
+$("coin").addEventListener("change",loadChart);
+$("auto").addEventListener("change",()=>{
  if(autoTimer)clearInterval(autoTimer);
  autoTimer=null;
- const minutes=Number($("interval").value);
- if(minutes>0){
-  autoTimer=setInterval(()=>{
-   if(!$("scanBtn").disabled)scanMarkets();
-  },minutes*60000);
- }
+ const mins=Number($("auto").value);
+ if(mins)autoTimer=setInterval(()=>{if(!$("scan").disabled)scanMarkets()},mins*60000);
 });
-
-window.addEventListener("resize",()=>{
- if(results.length)loadChart();
-});
+window.addEventListener("resize",()=>{if($("coin").value)loadChart()});
 </script>
 </body>
 </html>

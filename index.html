@@ -1,4 +1,4 @@
-
+Writing
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,14 +15,10 @@
   --green:#16c784; --red:#ea3943; --yellow:#f0b90b; --blue:#5794f7;
 }
 * { box-sizing:border-box; }
-body {
-  margin:0; background:var(--bg); color:var(--text);
-  font-family:Arial,Helvetica,sans-serif; font-size:13px;
-}
+body { margin:0; background:var(--bg); color:var(--text); font-family:Arial,Helvetica,sans-serif; font-size:13px; }
 header {
   padding:16px; background:#111722; border-bottom:1px solid var(--border);
-  display:flex; justify-content:space-between; align-items:center;
-  gap:12px; flex-wrap:wrap;
+  display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
 }
 h1 { font-size:20px; margin:0; }
 h1 span { color:var(--yellow); }
@@ -37,19 +33,11 @@ button:hover { border-color:var(--yellow); }
 button.active { background:#473b12; border-color:var(--yellow); color:#ffdb55; }
 button:disabled { opacity:.5; cursor:not-allowed; }
 main { padding:14px; max-width:1800px; margin:auto; }
-.stats {
-  display:grid; grid-template-columns:repeat(5,minmax(110px,1fr));
-  gap:10px; margin-bottom:14px;
-}
-.stat {
-  background:var(--panel); border:1px solid var(--border);
-  border-radius:10px; padding:13px;
-}
+.stats { display:grid; grid-template-columns:repeat(5,minmax(110px,1fr)); gap:10px; margin-bottom:14px; }
+.stat { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:13px; }
 .stat .label { color:var(--muted); font-size:11px; }
 .stat .value { font-size:22px; font-weight:bold; margin-top:8px; }
-.toolbar,.filters {
-  display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;
-}
+.toolbar,.filters { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
 .filters { padding:11px; background:var(--panel); border:1px solid var(--border); border-radius:10px; }
 .filters .group-label { color:var(--muted); font-size:11px; margin-right:2px; }
 #search { min-width:150px; }
@@ -63,10 +51,7 @@ main { padding:14px; max-width:1800px; margin:auto; }
 .table-wrap { width:100%; overflow:auto; max-height:650px; }
 table { border-collapse:collapse; width:100%; min-width:1350px; }
 th,td { padding:11px 10px; border-bottom:1px solid #222b39; text-align:right; white-space:nowrap; }
-th {
-  position:sticky; top:0; background:#171e2a; color:var(--muted);
-  font-size:10px; z-index:2; cursor:pointer;
-}
+th { position:sticky; top:0; background:#171e2a; color:var(--muted); font-size:10px; z-index:2; cursor:pointer; }
 td:first-child,th:first-child { text-align:left; position:sticky; left:0; }
 td:first-child { background:var(--panel); z-index:1; }
 th:first-child { z-index:3; background:#171e2a; }
@@ -79,13 +64,9 @@ tbody tr.selected td { background:#243149; }
 .yellow { color:var(--yellow); }
 .muted { color:var(--muted); }
 .tag { display:inline-block; padding:4px 6px; border-radius:5px; font-size:10px; font-weight:bold; }
-.tag-buy { color:var(--green); background:#123529; }
-.tag-sell { color:var(--red); background:#3c1d25; }
+.tag-buy,.tag-long,.tag-bull { color:var(--green); background:#123529; }
+.tag-sell,.tag-short,.tag-bear { color:var(--red); background:#3c1d25; }
 .tag-neutral { color:#b6c0d0; background:#252d3a; }
-.tag-long { color:var(--green); background:#123529; }
-.tag-short { color:var(--red); background:#3c1d25; }
-.tag-bull { color:var(--green); background:#123529; }
-.tag-bear { color:var(--red); background:#3c1d25; }
 .tag-wait { color:var(--yellow); background:#3d3212; }
 .chart-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(260px,1fr); gap:12px; padding:12px; }
 .chart { height:320px; width:100%; }
@@ -176,22 +157,10 @@ footer { color:var(--muted); padding:18px 4px; font-size:11px; line-height:1.6; 
       <table>
         <thead>
           <tr>
-            <th>Coin</th>
-            <th>Price</th>
-            <th>24h %</th>
-            <th>Signal</th>
-            <th>15m RSI</th>
-            <th>1h RSI</th>
-            <th>4h Trend</th>
-            <th>MA Bias</th>
-            <th>MA Score</th>
-            <th>EP</th>
-            <th>SL</th>
-            <th>TP1</th>
-            <th>TP2</th>
-            <th>TP3</th>
-            <th>RR</th>
-            <th>24h Volume</th>
+            <th>Coin</th><th>Price</th><th>24h %</th><th>Signal</th>
+            <th>15m RSI</th><th>1h RSI</th><th>4h Trend</th><th>MA Bias</th>
+            <th>MA Score</th><th>EP</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th>
+            <th>RR</th><th>24h Volume</th>
           </tr>
         </thead>
         <tbody id="coinRows">
@@ -200,7 +169,10 @@ footer { color:var(--muted); padding:18px 4px; font-size:11px; line-height:1.6; 
       </table>
     </div>
     <div class="note">
-      Signal rules: BUY requires 15m and 1h lower Bollinger Band touches, RSI below 30 on both timeframes, and a green/upward live 15m candle. SELL requires upper-band touches, RSI above 80 on both timeframes, and a red/downward live 15m candle. The 4h trend is context only and does not trigger BUY/SELL.
+      Signal rules: BUY requires a 1h lower Bollinger Band touch and 1h RSI below 30.
+      SELL requires a 1h upper Bollinger Band touch and 1h RSI above 80.
+      No 15m candle or 15m RSI condition is used to trigger BUY/SELL.
+      The 4h trend is context only and does not trigger BUY/SELL.
     </div>
   </section>
 
@@ -217,7 +189,7 @@ footer { color:var(--muted); padding:18px 4px; font-size:11px; line-height:1.6; 
   <footer>
     Data source: Binance public Spot API. This scanner does not place orders and does not need your API key.
     Estimated entry, stop-loss and targets are illustrative calculations, not guaranteed recommendations.
-    The trade plan is based on the latest price and 15m ATR; its direction may be inferred from the signal or MA bias.
+    The trade plan uses the latest price and 15m ATR; its direction may be inferred from the signal or MA bias.
     Public API limits, browser connectivity, and large market scans can affect refresh time.
   </footer>
 </main>
@@ -260,9 +232,7 @@ async function api(path) {
     lastRequestAt = Date.now();
 
     const response = await fetch(API + path);
-    if (!response.ok) {
-      throw new Error('Binance API error: ' + response.status);
-    }
+    if (!response.ok) throw new Error('Binance API error: ' + response.status);
     return response.json();
   };
 
@@ -271,9 +241,7 @@ async function api(path) {
   return task;
 }
 
-function num(v) {
-  return Number(v);
-}
+function num(v) { return Number(v); }
 
 function fmtPrice(v) {
   if (!Number.isFinite(v)) return '—';
@@ -407,6 +375,7 @@ function adxIndicators(candles, period=14) {
   const plus=Array(n).fill(null), minus=Array(n).fill(null);
   const dx=Array(n).fill(null), adx=Array(n).fill(null);
   const tr=Array(n).fill(null);
+
   for (let i=1; i<n; i++) {
     const c=candles[i], p=candles[i-1];
     const up=c.high-p.high;
@@ -415,6 +384,7 @@ function adxIndicators(candles, period=14) {
     minus[i]=(down>up && down>0) ? down : 0;
     tr[i]=Math.max(c.high-c.low,Math.abs(c.high-p.close),Math.abs(c.low-p.close));
   }
+
   if (n < period*2+2) return {adx,plusDI:plus,minusDI:minus};
 
   let trSum=0,pSum=0,mSum=0;
@@ -437,7 +407,7 @@ function adxIndicators(candles, period=14) {
     dx[i]=(pdi+mdi) ? 100*Math.abs(pdi-mdi)/(pdi+mdi) : 0;
   }
 
-  let first=period*2-1;
+  const first=period*2-1;
   let dxSum=0, count=0;
   for (let i=period; i<=first; i++) {
     if (dx[i]!==null) { dxSum+=dx[i]; count++; }
@@ -472,25 +442,15 @@ function maBias(candles, indicators) {
   const p=candles[i].close;
   const {sma50,sma200,ema20,ema50,ema200}=indicators;
   const values=[p,sma50[i],sma200[i],ema20[i],ema50[i],ema200[i]];
-  if (values.some(v=>v===null || !Number.isFinite(v))) {
-    return {bias:'NEUTRAL',score:0};
-  }
+  if (values.some(v=>v===null || !Number.isFinite(v))) return {bias:'NEUTRAL',score:0};
 
   const longChecks=[
-    p>sma50[i],
-    sma50[i]>sma200[i],
-    p>ema20[i],
-    ema20[i]>ema50[i],
-    ema50[i]>ema200[i],
-    p>ema200[i]
+    p>sma50[i], sma50[i]>sma200[i], p>ema20[i],
+    ema20[i]>ema50[i], ema50[i]>ema200[i], p>ema200[i]
   ];
   const shortChecks=[
-    p<sma50[i],
-    sma50[i]<sma200[i],
-    p<ema20[i],
-    ema20[i]<ema50[i],
-    ema50[i]<ema200[i],
-    p<ema200[i]
+    p<sma50[i], sma50[i]<sma200[i], p<ema20[i],
+    ema20[i]<ema50[i], ema50[i]<ema200[i], p<ema200[i]
   ];
 
   const longScore=longChecks.filter(Boolean).length;
@@ -504,7 +464,6 @@ function maBias(candles, indicators) {
 }
 
 function getFourHourTrend(candles, indicators) {
-  // Use the last COMPLETED 4h candle, not the live one.
   const i=candles.length-2;
   if (i<200) return {trend:'NEUTRAL',rsi:null,adx:null,plusDI:null,minusDI:null};
 
@@ -541,35 +500,32 @@ function makePlan(side, price, atrValue) {
   };
 }
 
+/*
+  UPDATED BUY/SELL CONDITIONS:
+  BUY: 1h low touches or crosses the lower Bollinger Band AND 1h RSI < 30.
+  SELL: 1h high touches or crosses the upper Bollinger Band AND 1h RSI > 80.
+  No 15m candle or 15m RSI confirmation is required.
+*/
 function calculateSignal(c15, c1h, i15, i1h) {
-  const a=c15.length-1; // live 15m candle
-  const b=c1h.length-1; // latest 1h candle
-  if (a<30 || b<30) return 'WAIT';
+  const b=c1h.length-1;
 
-  const live=c15[a], previous=c15[a-1];
-  const lower15=i15.bb.lower[a], upper15=i15.bb.upper[a];
-  const lower1h=i1h.bb.lower[b], upper1h=i1h.bb.upper[b];
-  const r15=i15.rsi[a], r1h=i1h.rsi[b];
+  if (b<30) return 'WAIT';
 
-  if ([lower15,upper15,lower1h,upper1h,r15,r1h].some(v=>v===null || !Number.isFinite(v))) {
+  const lower1h=i1h.bb.lower[b];
+  const upper1h=i1h.bb.upper[b];
+  const r1h=i1h.rsi[b];
+
+  if ([lower1h,upper1h,r1h].some(v=>v===null || !Number.isFinite(v))) {
     return 'WAIT';
   }
 
   const buy =
-    live.low<=lower15 &&
     c1h[b].low<=lower1h &&
-    r15<30 &&
-    r1h<30 &&
-    live.close>live.open &&
-    live.close>previous.close;
+    r1h<30;
 
   const sell =
-    live.high>=upper15 &&
     c1h[b].high>=upper1h &&
-    r15>80 &&
-    r1h>80 &&
-    live.close<live.open &&
-    live.close<previous.close;
+    r1h>80;
 
   if (buy) return 'BUY';
   if (sell) return 'SELL';
@@ -583,7 +539,7 @@ async function mapLimit(items, limit, callback) {
       const index=next++;
       if (index>=items.length) break;
       try { await callback(items[index],index); }
-      catch (error) { /* skip failed pair and continue */ }
+      catch (error) {}
     }
   });
   await Promise.all(workers);
@@ -616,7 +572,6 @@ async function fetchCoin(symbol) {
   const volume=num(ticker.quoteVolume);
   const atrValue=i15.atr[c15.length-1];
 
-  // Trade plan direction follows a live signal first, otherwise MA bias.
   const planSide=signal==='BUY' ? 'BUY' :
     signal==='SELL' ? 'SELL' :
     ma.bias==='SHORT' ? 'SHORT' : 'LONG';
@@ -670,9 +625,8 @@ async function scanAll() {
           results.set(symbol,coin);
           successful++;
         }
-      } catch (err) {
-        // Keep the scanner running when an individual pair fails.
-      }
+      } catch (err) {}
+
       finished++;
 
       if (finished%10===0 || finished===symbols.length) {
@@ -792,9 +746,7 @@ function render() {
 function checkAlerts() {
   for (const c of state.coins) {
     const old=state.lastSignal.get(c.symbol);
-    if ((c.signal==='BUY' || c.signal==='SELL') && old!==c.signal) {
-      notifySignal(c);
-    }
+    if ((c.signal==='BUY' || c.signal==='SELL') && old!==c.signal) notifySignal(c);
     state.lastSignal.set(c.symbol,c.signal);
   }
 }
@@ -910,13 +862,10 @@ function drawSelectedCharts(c) {
   state.rsiChart.timeScale().fitContent();
 
   const resize=()=>{
-    if (state.chart && $('priceChart')) {
-      state.chart.applyOptions({width:$('priceChart').clientWidth});
-    }
-    if (state.rsiChart && $('rsiChart')) {
-      state.rsiChart.applyOptions({width:$('rsiChart').clientWidth});
-    }
+    if (state.chart && $('priceChart')) state.chart.applyOptions({width:$('priceChart').clientWidth});
+    if (state.rsiChart && $('rsiChart')) state.rsiChart.applyOptions({width:$('rsiChart').clientWidth});
   };
+
   if (window.ResizeObserver) {
     const observer=new ResizeObserver(resize);
     observer.observe(priceContainer);
@@ -942,6 +891,7 @@ function bind() {
   $('search').addEventListener('input',render);
   $('sort').addEventListener('change',render);
   $('signalsOnly').addEventListener('change',render);
+
   $('chartTf').addEventListener('change',()=>{
     if (state.selected) selectCoin(state.selected);
   });
@@ -956,7 +906,6 @@ function bind() {
   });
 
   if ('Notification' in window && Notification.permission==='default') {
-    // Request notification permission only after a user action if needed.
     $('autoBtn').addEventListener('dblclick',()=>{
       Notification.requestPermission();
     });

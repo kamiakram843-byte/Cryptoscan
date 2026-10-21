@@ -1,4 +1,4 @@
-Writing
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,10 +15,14 @@ Writing
   --green:#16c784; --red:#ea3943; --yellow:#f0b90b; --blue:#5794f7;
 }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--text); font-family:Arial,Helvetica,sans-serif; font-size:13px; }
+body {
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:Arial,Helvetica,sans-serif; font-size:13px;
+}
 header {
   padding:16px; background:#111722; border-bottom:1px solid var(--border);
-  display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; flex-wrap:wrap;
 }
 h1 { font-size:20px; margin:0; }
 h1 span { color:var(--yellow); }
@@ -33,16 +37,23 @@ button:hover { border-color:var(--yellow); }
 button.active { background:#473b12; border-color:var(--yellow); color:#ffdb55; }
 button:disabled { opacity:.5; cursor:not-allowed; }
 main { padding:14px; max-width:1800px; margin:auto; }
-.stats { display:grid; grid-template-columns:repeat(5,minmax(110px,1fr)); gap:10px; margin-bottom:14px; }
-.stat { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:13px; }
+.stats {
+  display:grid; grid-template-columns:repeat(5,minmax(110px,1fr));
+  gap:10px; margin-bottom:14px;
+}
+.stat {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:10px; padding:13px;
+}
 .stat .label { color:var(--muted); font-size:11px; }
 .stat .value { font-size:22px; font-weight:bold; margin-top:8px; }
-.toolbar,.filters { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.toolbar,.filters {
+  display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;
+}
 .filters { padding:11px; background:var(--panel); border:1px solid var(--border); border-radius:10px; }
 .filters .group-label { color:var(--muted); font-size:11px; margin-right:2px; }
 #search { min-width:150px; }
 .status { color:var(--muted); font-size:12px; margin:8px 0 12px; }
-.layout { display:grid; grid-template-columns:minmax(0,1fr); gap:14px; }
 .panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
 .panel-title {
   padding:13px 14px; font-weight:bold; border-bottom:1px solid var(--border);
@@ -51,7 +62,10 @@ main { padding:14px; max-width:1800px; margin:auto; }
 .table-wrap { width:100%; overflow:auto; max-height:650px; }
 table { border-collapse:collapse; width:100%; min-width:1350px; }
 th,td { padding:11px 10px; border-bottom:1px solid #222b39; text-align:right; white-space:nowrap; }
-th { position:sticky; top:0; background:#171e2a; color:var(--muted); font-size:10px; z-index:2; cursor:pointer; }
+th {
+  position:sticky; top:0; background:#171e2a; color:var(--muted);
+  font-size:10px; z-index:2; cursor:pointer;
+}
 td:first-child,th:first-child { text-align:left; position:sticky; left:0; }
 td:first-child { background:var(--panel); z-index:1; }
 th:first-child { z-index:3; background:#171e2a; }
@@ -77,7 +91,6 @@ tbody tr.selected td { background:#243149; }
 .detail .label { color:var(--muted); font-size:10px; }
 .detail .value { font-weight:bold; font-size:14px; margin-top:7px; overflow-wrap:anywhere; }
 .note { color:var(--muted); font-size:11px; line-height:1.6; padding:12px 14px; }
-.small-btn { padding:6px 8px; }
 footer { color:var(--muted); padding:18px 4px; font-size:11px; line-height:1.6; }
 @media(max-width:900px) {
   .stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -92,7 +105,7 @@ footer { color:var(--muted); padding:18px 4px; font-size:11px; line-height:1.6; 
 <header>
   <div>
     <h1><span>BINANCE</span> SPOT SCANNER PRO</h1>
-    <div class="subtitle">Multi-timeframe Bollinger Bands · RSI · 4H trend · SMA/EMA</div>
+    <div class="subtitle">1H Bollinger Bands · RSI · Candle Confirmation · 4H Trend · SMA/EMA</div>
   </div>
   <div class="toolbar" style="margin:0">
     <button id="scanBtn">Scan Now</button>
@@ -151,28 +164,25 @@ footer { color:var(--muted); padding:18px 4px; font-size:11px; line-height:1.6; 
   <section class="panel">
     <div class="panel-title">
       <span>Market Scanner</span>
-      <span class="muted">Select a row to view its charts and trade estimates</span>
+      <span class="muted">Select a row to view charts and trade estimates</span>
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Coin</th><th>Price</th><th>24h %</th><th>Signal</th>
-            <th>15m RSI</th><th>1h RSI</th><th>4h Trend</th><th>MA Bias</th>
-            <th>MA Score</th><th>EP</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th>
-            <th>RR</th><th>24h Volume</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Coin</th><th>Price</th><th>24h %</th><th>Signal</th>
+          <th>15m RSI</th><th>1h RSI</th><th>4h Trend</th><th>MA Bias</th>
+          <th>MA Score</th><th>EP</th><th>SL</th><th>TP1</th><th>TP2</th><th>TP3</th>
+          <th>RR</th><th>24h Volume</th>
+        </tr></thead>
         <tbody id="coinRows">
           <tr><td colspan="16" class="muted" style="text-align:center;padding:30px">Press Scan Now to load market data.</td></tr>
         </tbody>
       </table>
     </div>
     <div class="note">
-      Signal rules: BUY requires a 1h lower Bollinger Band touch and 1h RSI below 30.
-      SELL requires a 1h upper Bollinger Band touch and 1h RSI above 80.
-      No 15m candle or 15m RSI condition is used to trigger BUY/SELL.
-      The 4h trend is context only and does not trigger BUY/SELL.
+      BUY: 1H lower Bollinger Band touch + 1H RSI below 30 + bullish/upward 1H candle.
+      SELL: 1H upper Bollinger Band touch + 1H RSI above 80 + bearish/downward 1H candle.
+      The live 1H candle is used for signal confirmation. The 4H trend is context only.
     </div>
   </section>
 
@@ -188,8 +198,8 @@ footer { color:var(--muted); padding:18px 4px; font-size:11px; line-height:1.6; 
 
   <footer>
     Data source: Binance public Spot API. This scanner does not place orders and does not need your API key.
-    Estimated entry, stop-loss and targets are illustrative calculations, not guaranteed recommendations.
-    The trade plan uses the latest price and 15m ATR; its direction may be inferred from the signal or MA bias.
+    Entry, stop-loss and targets are illustrative estimates, not guaranteed recommendations.
+    Trade-plan risk uses 1.5 × 15m ATR. BUY targets are above entry; SELL targets are below entry.
     Public API limits, browser connectivity, and large market scans can affect refresh time.
   </footer>
 </main>
@@ -212,8 +222,7 @@ const state = {
   candleSeries: null,
   lineSeries: {},
   rsiChart: null,
-  rsiSeries: null,
-  chartRequestId: 0
+  rsiSeries: null
 };
 
 const INTERVAL_MS = 180000;
@@ -442,7 +451,9 @@ function maBias(candles, indicators) {
   const p=candles[i].close;
   const {sma50,sma200,ema20,ema50,ema200}=indicators;
   const values=[p,sma50[i],sma200[i],ema20[i],ema50[i],ema200[i]];
-  if (values.some(v=>v===null || !Number.isFinite(v))) return {bias:'NEUTRAL',score:0};
+  if (values.some(v=>v===null || !Number.isFinite(v))) {
+    return {bias:'NEUTRAL',score:0};
+  }
 
   const longChecks=[
     p>sma50[i], sma50[i]>sma200[i], p>ema20[i],
@@ -484,14 +495,22 @@ function getFourHourTrend(candles, indicators) {
   return {trend,rsi:rv,adx:av,plusDI:pdi,minusDI:mdi};
 }
 
+/* Trade levels always follow the selected side:
+   BUY: SL below entry, targets above entry.
+   SELL: SL above entry, targets below entry.
+*/
 function makePlan(side, price, atrValue) {
-  const risk=Number.isFinite(atrValue) && atrValue>0 ? atrValue*1.5 : price*0.015;
-  const direction=side==='SELL' || side==='SHORT' ? -1 : 1;
+  const risk=Number.isFinite(atrValue) && atrValue>0
+    ? atrValue*1.5
+    : price*0.015;
+
+  const isSell=side==='SELL' || side==='SHORT';
+  const direction=isSell ? -1 : 1;
   const entry=price;
-  const stop=entry-direction*risk;
+
   return {
     ep:entry,
-    sl:stop,
+    sl:entry-direction*risk,
     tp1:entry+direction*risk,
     tp2:entry+direction*risk*2,
     tp3:entry+direction*risk*3,
@@ -500,32 +519,51 @@ function makePlan(side, price, atrValue) {
   };
 }
 
-/*
-  UPDATED BUY/SELL CONDITIONS:
-  BUY: 1h low touches or crosses the lower Bollinger Band AND 1h RSI < 30.
-  SELL: 1h high touches or crosses the upper Bollinger Band AND 1h RSI > 80.
-  No 15m candle or 15m RSI confirmation is required.
+/* BUY:
+   1H low touches/crosses lower Bollinger Band.
+   1H RSI < 30.
+   1H candle is green and closes above the previous 1H close.
+
+   SELL:
+   1H high touches/crosses upper Bollinger Band.
+   1H RSI > 80.
+   1H candle is red and closes below the previous 1H close.
+
+   No 15m candle or 15m RSI condition is used.
 */
-function calculateSignal(c15, c1h, i15, i1h) {
-  const b=c1h.length-1;
+function calculateSignal(c1h, i1h) {
+  const i=c1h.length-1;
+  const prev=i-1;
 
-  if (b<30) return 'WAIT';
+  if (prev<20) return 'WAIT';
 
-  const lower1h=i1h.bb.lower[b];
-  const upper1h=i1h.bb.upper[b];
-  const r1h=i1h.rsi[b];
+  const candle=c1h[i];
+  const previous=c1h[prev];
+  const lower=i1h.bb.lower[i];
+  const upper=i1h.bb.upper[i];
+  const rv=i1h.rsi[i];
 
-  if ([lower1h,upper1h,r1h].some(v=>v===null || !Number.isFinite(v))) {
+  if ([lower,upper,rv].some(v=>v===null || !Number.isFinite(v))) {
     return 'WAIT';
   }
 
+  const bullishCandle =
+    candle.close>candle.open &&
+    candle.close>previous.close;
+
+  const bearishCandle =
+    candle.close<candle.open &&
+    candle.close<previous.close;
+
   const buy =
-    c1h[b].low<=lower1h &&
-    r1h<30;
+    candle.low<=lower &&
+    rv<30 &&
+    bullishCandle;
 
   const sell =
-    c1h[b].high>=upper1h &&
-    r1h>80;
+    candle.high>=upper &&
+    rv>80 &&
+    bearishCandle;
 
   if (buy) return 'BUY';
   if (sell) return 'SELL';
@@ -563,7 +601,7 @@ async function fetchCoin(symbol) {
   const i1h=getIndicators(c1h);
   const i4h=getIndicators(c4h);
 
-  const signal=calculateSignal(c15,c1h,i15,i1h);
+  const signal=calculateSignal(c1h,i1h);
   const trend=getFourHourTrend(c4h,i4h);
   const ma=maBias(c4h,i4h);
 
@@ -572,6 +610,8 @@ async function fetchCoin(symbol) {
   const volume=num(ticker.quoteVolume);
   const atrValue=i15.atr[c15.length-1];
 
+  // Signal determines trade direction first.
+  // MA bias is used only when there is no BUY/SELL signal.
   const planSide=signal==='BUY' ? 'BUY' :
     signal==='SELL' ? 'SELL' :
     ma.bias==='SHORT' ? 'SHORT' : 'LONG';
@@ -579,33 +619,32 @@ async function fetchCoin(symbol) {
   const plan=makePlan(planSide,price,atrValue);
 
   return {
-    symbol, price, change, volume, signal, trend:trend.trend,
-    trendDetails:trend, maBias:ma.bias, maScore:ma.score,
+    symbol,price,change,volume,signal,trend:trend.trend,
+    trendDetails:trend,maBias:ma.bias,maScore:ma.score,
     rsi15:i15.rsi[c15.length-1],
     rsi1h:i1h.rsi[c1h.length-1],
-    candles15:c15, candles1h:c1h, candles4h:c4h,
-    ind15:i15, ind1h:i1h, ind4h:i4h,
-    plan, planSide, updatedAt:Date.now()
+    candles15:c15,candles1h:c1h,candles4h:c4h,
+    ind15:i15,ind1h:i1h,ind4h:i4h,
+    plan,planSide,updatedAt:Date.now()
   };
 }
 
 async function getSymbols() {
   const info=await api('/api/v3/exchangeInfo');
-  return info.symbols
-    .filter(s =>
-      s.status==='TRADING' &&
-      s.quoteAsset==='USDT' &&
-      s.isSpotTradingAllowed!==false &&
-      !s.symbol.endsWith('UPUSDT') &&
-      !s.symbol.endsWith('DOWNUSDT') &&
-      !s.symbol.endsWith('BULLUSDT') &&
-      !s.symbol.endsWith('BEARUSDT')
-    )
-    .map(s=>s.symbol);
+  return info.symbols.filter(s =>
+    s.status==='TRADING' &&
+    s.quoteAsset==='USDT' &&
+    s.isSpotTradingAllowed!==false &&
+    !s.symbol.endsWith('UPUSDT') &&
+    !s.symbol.endsWith('DOWNUSDT') &&
+    !s.symbol.endsWith('BULLUSDT') &&
+    !s.symbol.endsWith('BEARUSDT')
+  ).map(s=>s.symbol);
 }
 
 async function scanAll() {
   if (state.scanning) return;
+
   state.scanning=true;
   $('scanBtn').disabled=true;
   $('status').textContent='Loading Binance spot symbols...';
@@ -613,7 +652,8 @@ async function scanAll() {
   try {
     const symbols=await getSymbols();
     $('totalCount').textContent=symbols.length;
-    let finished=0, successful=0;
+
+    let finished=0,successful=0;
     const results=new Map(state.coins.map(c=>[c.symbol,c]));
 
     $('status').textContent=`Scanning ${symbols.length} USDT spot pairs. This may take several minutes...`;
@@ -643,6 +683,14 @@ async function scanAll() {
     $('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString();
     $('status').textContent=`Scan complete. Loaded ${successful} of ${symbols.length} pairs.`;
     checkAlerts();
+
+    if (state.selected) {
+      const selectedCoin=state.coins.find(c=>c.symbol===state.selected);
+      if (selectedCoin) {
+        $('selectedMeta').textContent=
+          `Signal ${selectedCoin.signal} · 4H ${selectedCoin.trend} · MA ${selectedCoin.maBias} (${selectedCoin.maScore}/6)`;
+      }
+    }
   } catch (error) {
     $('status').textContent='Scan failed: '+error.message+'. Check your internet connection or try again.';
   } finally {
@@ -718,6 +766,7 @@ function render() {
   tbody.innerHTML=list.map(c=>{
     const selected=state.selected===c.symbol?'selected':'';
     const plan=c.plan||{};
+
     return `<tr class="${selected}" data-symbol="${c.symbol}">
       <td><div class="coin">${c.symbol.replace('USDT','')}<span class="muted"> / USDT</span></div><div class="sub">${c.symbol}</div></td>
       <td>${fmtPrice(c.price)}</td>
@@ -730,9 +779,9 @@ function render() {
       <td>${c.maScore}/6</td>
       <td>${fmtPrice(plan.ep)}</td>
       <td class="red">${fmtPrice(plan.sl)}</td>
-      <td class="green">${fmtPrice(plan.tp1)}</td>
-      <td class="green">${fmtPrice(plan.tp2)}</td>
-      <td class="green">${fmtPrice(plan.tp3)}</td>
+      <td class="${c.planSide==='SELL'||c.planSide==='SHORT'?'red':'green'}">${fmtPrice(plan.tp1)}</td>
+      <td class="${c.planSide==='SELL'||c.planSide==='SHORT'?'red':'green'}">${fmtPrice(plan.tp2)}</td>
+      <td class="${c.planSide==='SELL'||c.planSide==='SHORT'?'red':'green'}">${fmtPrice(plan.tp3)}</td>
       <td>${plan.rr||'—'}</td>
       <td>${fmtVolume(c.volume)}</td>
     </tr>`;
@@ -746,7 +795,9 @@ function render() {
 function checkAlerts() {
   for (const c of state.coins) {
     const old=state.lastSignal.get(c.symbol);
-    if ((c.signal==='BUY' || c.signal==='SELL') && old!==c.signal) notifySignal(c);
+    if ((c.signal==='BUY' || c.signal==='SELL') && old!==c.signal) {
+      notifySignal(c);
+    }
     state.lastSignal.set(c.symbol,c.signal);
   }
 }
@@ -759,7 +810,7 @@ function notifySignal(c) {
   $('status').textContent=message;
 }
 
-function createChart(container, height) {
+function createChart(container,height) {
   return LightweightCharts.createChart(container,{
     width:container.clientWidth,
     height,
@@ -771,7 +822,7 @@ function createChart(container, height) {
   });
 }
 
-function setLineData(series, candles, values) {
+function setLineData(series,candles,values) {
   const data=[];
   for (let i=0;i<candles.length;i++) {
     if (values[i]!==null && Number.isFinite(values[i])) {
@@ -781,14 +832,15 @@ function setLineData(series, candles, values) {
   series.setData(data);
 }
 
-async function selectCoin(symbol) {
+function selectCoin(symbol) {
   const c=state.coins.find(x=>x.symbol===symbol);
   if (!c) return;
 
   state.selected=symbol;
   render();
   $('selectedTitle').textContent=symbol+' · Charts & Trade Plan';
-  $('selectedMeta').textContent=`Signal ${c.signal} · 4H ${c.trend} · MA ${c.maBias} (${c.maScore}/6)`;
+  $('selectedMeta').textContent=
+    `Signal ${c.signal} · 4H ${c.trend} · MA ${c.maBias} (${c.maScore}/6)`;
   drawSelectedCharts(c);
 }
 
@@ -798,24 +850,32 @@ function drawSelectedCharts(c) {
     return;
   }
 
+  const isSell=c.planSide==='SELL'||c.planSide==='SHORT';
+  const targetColor=isSell?'red':'green';
+  const directionText=isSell?'Targets are BELOW entry':'Targets are ABOVE entry';
+
   $('chartArea').innerHTML=`
     <div class="details">
       <div class="detail"><div class="label">ESTIMATED ENTRY (EP)</div><div class="value">${fmtPrice(c.plan.ep)}</div></div>
       <div class="detail"><div class="label">STOP LOSS (SL)</div><div class="value red">${fmtPrice(c.plan.sl)}</div></div>
-      <div class="detail"><div class="label">TAKE PROFIT 1</div><div class="value green">${fmtPrice(c.plan.tp1)}</div></div>
-      <div class="detail"><div class="label">TAKE PROFIT 2</div><div class="value green">${fmtPrice(c.plan.tp2)}</div></div>
-      <div class="detail"><div class="label">TAKE PROFIT 3</div><div class="value green">${fmtPrice(c.plan.tp3)}</div></div>
+      <div class="detail"><div class="label">TAKE PROFIT 1</div><div class="value ${targetColor}">${fmtPrice(c.plan.tp1)}</div></div>
+      <div class="detail"><div class="label">TAKE PROFIT 2</div><div class="value ${targetColor}">${fmtPrice(c.plan.tp2)}</div></div>
+      <div class="detail"><div class="label">TAKE PROFIT 3</div><div class="value ${targetColor}">${fmtPrice(c.plan.tp3)}</div></div>
       <div class="detail"><div class="label">RISK / REWARD</div><div class="value">${c.plan.rr}</div></div>
     </div>
-    <div class="note">Trade-plan direction: <b>${c.planSide}</b>. This is a mathematical estimate using 1.5 × 15m ATR for risk and 1R, 2R, 3R targets. For WAIT signals, direction is inferred from MA bias, so these levels are not a trade recommendation.</div>
+    <div class="note">
+      Trade-plan direction: <b>${c.planSide}</b>. ${directionText}.
+      Risk is based on 1.5 × 15m ATR, with targets at 1R, 2R and 3R.
+      For WAIT signals, direction is inferred from MA bias; these levels are not a trade recommendation.
+    </div>
     <div class="chart-grid">
       <div><div class="muted" style="margin:2px 0 8px">Candles · Bollinger Bands · SMA/EMA 20 & 50</div><div id="priceChart" class="chart"></div></div>
       <div><div class="muted" style="margin:2px 0 8px">RSI (14)</div><div id="rsiChart" class="chart"></div><div class="note">15m RSI: ${fmtNum(c.rsi15)} · 1h RSI: ${fmtNum(c.rsi1h)}<br>4h ADX: ${fmtNum(c.trendDetails.adx)} · +DI: ${fmtNum(c.trendDetails.plusDI)} · −DI: ${fmtNum(c.trendDetails.minusDI)}</div></div>
     </div>`;
 
   const tf=$('chartTf').value;
-  const candles=tf==='1h' ? c.candles1h : tf==='4h' ? c.candles4h : c.candles15;
-  const indicators=tf==='1h' ? c.ind1h : tf==='4h' ? c.ind4h : c.ind15;
+  const candles=tf==='1h'?c.candles1h:tf==='4h'?c.candles4h:c.candles15;
+  const indicators=tf==='1h'?c.ind1h:tf==='4h'?c.ind4h:c.ind15;
   const priceContainer=$('priceChart');
   const rsiContainer=$('rsiChart');
 
@@ -830,6 +890,7 @@ function drawSelectedCharts(c) {
     borderUpColor:'#16c784',borderDownColor:'#ea3943',
     wickUpColor:'#16c784',wickDownColor:'#ea3943'
   });
+
   state.candleSeries.setData(candles.map(x=>({
     time:x.time,open:x.open,high:x.high,low:x.low,close:x.close
   })));
@@ -862,8 +923,12 @@ function drawSelectedCharts(c) {
   state.rsiChart.timeScale().fitContent();
 
   const resize=()=>{
-    if (state.chart && $('priceChart')) state.chart.applyOptions({width:$('priceChart').clientWidth});
-    if (state.rsiChart && $('rsiChart')) state.rsiChart.applyOptions({width:$('rsiChart').clientWidth});
+    if (state.chart && $('priceChart')) {
+      state.chart.applyOptions({width:$('priceChart').clientWidth});
+    }
+    if (state.rsiChart && $('rsiChart')) {
+      state.rsiChart.applyOptions({width:$('rsiChart').clientWidth});
+    }
   };
 
   if (window.ResizeObserver) {
@@ -900,8 +965,10 @@ function bind() {
     state.auto=!state.auto;
     $('autoBtn').textContent='Auto Refresh: '+(state.auto?'ON':'OFF');
     $('autoBtn').classList.toggle('active',state.auto);
+
     if (state.timer) clearInterval(state.timer);
     state.timer=null;
+
     if (state.auto) state.timer=setInterval(scanAll,INTERVAL_MS);
   });
 
